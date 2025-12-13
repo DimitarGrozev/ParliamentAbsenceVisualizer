@@ -1,6 +1,6 @@
 # Bulgarian Parliament Absence Visualizer
 
-A React application to visualize absences from the Bulgarian Parliament with engaging visuals emphasizing missing members with their photos.
+A full-stack application to visualize absences from the Bulgarian Parliament with engaging visuals emphasizing missing members with their photos.
 
 ## Features
 
@@ -18,6 +18,7 @@ A React application to visualize absences from the Bulgarian Parliament with eng
 
 ## Technology Stack
 
+### Frontend
 - **Build Tool**: Vite
 - **Language**: TypeScript
 - **UI Framework**: Material-UI (MUI) v7
@@ -25,93 +26,162 @@ A React application to visualize absences from the Bulgarian Parliament with eng
 - **HTTP Client**: Fetch API
 - **Date Handling**: date-fns
 
+### Backend
+- **.NET Version**: .NET 9.0
+- **Framework**: ASP.NET Core Web API
+- **Language**: C#
+- **API Documentation**: Swagger/OpenAPI
+
+## Architecture
+
+This application uses a **.NET backend** that serves the React frontend and acts as a proxy to the Bulgarian Parliament API. This architecture:
+
+- **Solves CORS issues**: The .NET backend makes server-to-server calls to parliament.bg
+- **Simplifies deployment**: Single application to deploy
+- **Improves security**: API keys and external URLs are hidden from the client
+- **Better performance**: Server-side caching can be added easily
+
+```
+┌─────────────┐      ┌──────────────┐      ┌─────────────────┐
+│   Browser   │─────▶│ .NET Backend │─────▶│ Parliament API  │
+│  (React)    │◀─────│   (Proxy)    │◀─────│  (parliament.bg)│
+└─────────────┘      └──────────────┘      └─────────────────┘
+```
+
 ## Project Structure
 
 ```
 ParliamentAbsenceVisualizer/
-├── src/
-│   ├── components/          # React components
-│   │   ├── AbsentMemberCard.tsx
-│   │   ├── AbsentMembersList.tsx
-│   │   ├── PartyAbsenceCard.tsx
-│   │   ├── TopAbsentPartiesPanel.tsx
-│   │   ├── DateRangeSelector.tsx
-│   │   └── Layout/
-│   │       ├── Header.tsx
-│   │       └── MainLayout.tsx
-│   ├── hooks/              # Custom React hooks
-│   │   └── useAbsences.ts
-│   ├── services/           # API integration
-│   │   └── api.ts
-│   ├── types/             # TypeScript type definitions
-│   │   ├── assembly.ts
-│   │   ├── party.ts
-│   │   ├── member.ts
-│   │   └── absence.ts
-│   ├── utils/             # Utility functions
-│   │   ├── datePresets.ts
-│   │   └── aggregations.ts
-│   ├── context/           # React Context
-│   │   └── AppContext.tsx
-│   ├── App.tsx           # Main app component
-│   ├── main.tsx          # Entry point
-│   └── theme.ts          # MUI theme configuration
-└── public/
+├── frontend/                    # React application
+│   ├── src/
+│   │   ├── components/          # React components
+│   │   ├── hooks/               # Custom React hooks
+│   │   ├── services/            # API integration
+│   │   ├── types/              # TypeScript type definitions
+│   │   ├── utils/              # Utility functions
+│   │   ├── context/            # React Context
+│   │   ├── App.tsx
+│   │   ├── main.tsx
+│   │   └── theme.ts
+│   ├── public/
+│   ├── package.json
+│   └── vite.config.ts
+│
+├── backend/                     # .NET Web API
+│   ├── Controllers/             # API endpoints
+│   │   ├── ParliamentController.cs
+│   │   └── ImagesController.cs
+│   ├── Models/                  # Data models
+│   │   ├── Assembly.cs
+│   │   ├── Party.cs
+│   │   ├── Member.cs
+│   │   ├── MembersResponse.cs
+│   │   ├── Absence.cs
+│   │   └── AbsenceRequest.cs
+│   ├── Services/                # Business logic
+│   │   └── ParliamentApiService.cs
+│   ├── Program.cs               # Application entry point
+│   └── ParliamentAbsenceVisualizer.Api.csproj
+│
+└── .github/workflows/           # CI/CD pipelines
 ```
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js (v18 or higher recommended)
+- **Node.js** (v20 or higher)
+- **.NET SDK** 9.0 or higher
 - npm or yarn
 
 ### Installation
 
-1. Clone the repository:
+1. **Clone the repository**:
    ```bash
    git clone https://github.com/DimitarGrozev/ParliamentAbsenceVisualizer.git
    cd ParliamentAbsenceVisualizer
    ```
 
-2. Install dependencies:
+2. **Install frontend dependencies**:
    ```bash
+   cd frontend
    npm install
+   cd ..
    ```
 
-3. Start the development server:
+3. **Restore backend dependencies**:
    ```bash
+   cd backend
+   dotnet restore
+   cd ..
+   ```
+
+### Development
+
+You need to run both the backend and frontend in development mode:
+
+1. **Start the .NET backend** (Terminal 1):
+   ```bash
+   cd backend
+   dotnet run
+   ```
+   The API will be available at `http://localhost:5000` (or `https://localhost:5001` for HTTPS)
+
+2. **Start the React frontend** (Terminal 2):
+   ```bash
+   cd frontend
    npm run dev
    ```
+   The app will be available at `http://localhost:5173`
 
-4. Open your browser and navigate to `http://localhost:5173`
+The Vite dev server will proxy API requests to the .NET backend automatically.
 
 ### Build for Production
 
+**Simple one-command build** - The frontend is automatically built when you build the backend:
+
 ```bash
+cd backend
+dotnet publish -c Release -o ./publish
+```
+
+This single command:
+1. Automatically runs `npm run build` in the frontend folder
+2. Builds the React app into `backend/wwwroot`
+3. Builds and publishes the .NET backend
+4. Outputs everything to `backend/publish/`
+
+**Alternative manual build** (if you prefer to build separately):
+```bash
+# Step 1: Build frontend
+cd frontend
 npm run build
+
+# Step 2: Publish backend
+cd ../backend
+dotnet publish -c Release -o ./publish
 ```
 
-The production-ready files will be in the `dist/` folder.
+The entire application will be in the `backend/publish/` folder and can be deployed as a single unit.
 
-### Preview Production Build
+### API Documentation
 
-```bash
-npm run preview
-```
+When running in development mode, Swagger UI is available at:
+- `http://localhost:5000/swagger`
+
+This provides interactive API documentation for all backend endpoints.
 
 ## API Integration
 
-The application integrates with the Bulgarian Parliament API:
+The application integrates with the Bulgarian Parliament API through the .NET backend:
 
-### CORS Handling
+### How CORS is Handled
 
-The Bulgarian Parliament API doesn't include CORS headers, so browser-based apps can't call it directly. The application uses **Vite's proxy feature** during development to bypass CORS restrictions:
-
-- API calls to `/api/*` are proxied to `https://www.parliament.bg/api/*`
-- Image requests to `/images/*` are proxied to `https://www.parliament.bg/images/*`
-
-**For production deployment**, you'll need to set up a similar proxy on your hosting server (e.g., using Nginx, Apache, or a Node.js server).
+The .NET backend acts as a proxy:
+- **Browser** ➜ **Frontend** (localhost:5173) ➜ calls `/api/*`
+- **Vite** proxies to **Backend** (localhost:5000)
+- **Backend** makes server-side HTTP calls to **parliament.bg**
+- No CORS issues because the backend makes the external requests
 
 ### Endpoints Used
 

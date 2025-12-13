@@ -17,27 +17,18 @@ interface UseAbsencesResult {
  * Automatically enriches absences with party and member information
  */
 export function useAbsences(dateRange: DateRange): UseAbsencesResult {
-  const { assembly, parties, members } = useAppContext();
+  const { parties, members } = useAppContext();
   const [absences, setAbsences] = useState<EnrichedAbsence[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = async () => {
-    // Don't fetch if assembly data isn't loaded yet
-    if (!assembly) {
-      return;
-    }
-
     try {
       setLoading(true);
       setError(null);
 
       // Build request payload
       const request: AbsenceRequest = {
-        A_ns_id: {
-          label: assembly.A_ns_CL_value,
-          id: assembly.A_ns_C_id,
-        },
         search: 1,
         date1: dateRange.date1,
         date2: dateRange.date2,
@@ -62,7 +53,7 @@ export function useAbsences(dateRange: DateRange): UseAbsencesResult {
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dateRange.date1, dateRange.date2, assembly?.A_ns_C_id]);
+  }, [dateRange.date1, dateRange.date2]);
 
   return {
     absences,

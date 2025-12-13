@@ -39,10 +39,6 @@ export interface AggregatedMemberAbsence {
 
 // API request payload for fetching absences
 export interface AbsenceRequest {
-  A_ns_id: {
-    label: string;  // Assembly name (e.g., "ПЕТДЕСЕТ И ПЪРВО НАРОДНО СЪБРАНИЕ")
-    id: number;     // Assembly ID
-  };
   search: 1;        // Always 1
   date1: string;    // Start date (YYYY-MM-DD)
   date2: string;    // End date (YYYY-MM-DD)

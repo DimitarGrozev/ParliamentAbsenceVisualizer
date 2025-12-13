@@ -431,3 +431,26 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Frontend specific
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/.vite/
+
+# Backend specific
+backend/bin/
+backend/obj/
+backend/Properties/
+
+# Keep root clean
+/api/
+/src/
+/public/
+/node_modules/
+/dist/
+/.vite/
+staticwebapp.config.json
+
+# wwwroot contains built frontend files
+backend/wwwroot/

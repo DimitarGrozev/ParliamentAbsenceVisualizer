@@ -3,9 +3,9 @@ import type { Party } from '../types/party';
 import type { MembersResponse } from '../types/member';
 import type { Absence, AbsenceRequest } from '../types/absence';
 
-// Use relative URL - works with both Vite dev proxy and Azure Static Web Apps proxy
-// Local: Vite proxy in vite.config.ts forwards /api to parliament.bg
-// Production: Azure Static Web Apps staticwebapp.config.json rewrites /api to parliament.bg
+// Use relative URL - works with both Vite dev proxy and .NET backend
+// Local dev: Vite proxy in vite.config.ts forwards /api to .NET backend (localhost:5000)
+// Production: .NET backend serves React app and proxies /api to parliament.bg
 const BASE_URL = '/api/v1';
 
 // Generic fetch wrapper with error handling
@@ -74,7 +74,7 @@ export async function fetchAbsences(request: AbsenceRequest): Promise<Absence[]>
 
 /**
  * Generate member image URL from member ID
- * Uses relative URL that works with both Vite proxy and Azure Static Web Apps proxy
+ * Uses relative URL that proxies through .NET backend to parliament.bg
  */
 export function getMemberImageUrl(memberId: number): string {
   return `/images/Assembly/${memberId}.png`;
