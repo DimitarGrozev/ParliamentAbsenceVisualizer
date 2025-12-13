@@ -3,9 +3,9 @@ import type { Party } from '../types/party';
 import type { MembersResponse } from '../types/member';
 import type { Absence, AbsenceRequest } from '../types/absence';
 
-// Use relative URL for Vite proxy in development
-// In production, you'll need to configure your server to proxy these requests
-const BASE_URL = '/api/v1';
+// Use absolute URL to Bulgarian Parliament API
+// Works in both development and production without proxy
+const BASE_URL = 'https://www.parliament.bg/api/v1';
 
 // Generic fetch wrapper with error handling
 async function apiFetch<T>(url: string, options?: RequestInit): Promise<T> {
@@ -73,8 +73,8 @@ export async function fetchAbsences(request: AbsenceRequest): Promise<Absence[]>
 
 /**
  * Generate member image URL from member ID
- * Uses relative URL for Vite proxy in development
+ * Uses absolute URL to Bulgarian Parliament API
  */
 export function getMemberImageUrl(memberId: number): string {
-  return `/images/Assembly/${memberId}.png`;
+  return `https://www.parliament.bg/images/Assembly/${memberId}.png`;
 }
