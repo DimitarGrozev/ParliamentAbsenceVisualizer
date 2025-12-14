@@ -9,6 +9,32 @@ export default defineConfig({
     // Output to backend's wwwroot folder
     outDir: path.resolve(__dirname, '../backend/wwwroot'),
     emptyOutDir: true,
+
+    // Optimize minification - remove console.logs in production
+    minify: 'terser',
+
+    // Manual chunk splitting for better caching
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // React core (50 KB)
+          'react-vendor': ['react', 'react-dom'],
+
+          // MUI core components (300 KB)
+          'mui-core': [
+            '@mui/material',
+            '@emotion/react',
+            '@emotion/styled'
+          ],
+
+          // MUI icons (150 KB)
+          'mui-icons': ['@mui/icons-material'],
+
+          // Date picker library (100 KB)
+          'mui-pickers': ['@mui/x-date-pickers', 'date-fns'],
+        }
+      }
+    }
   },
   server: {
     port: 5173,

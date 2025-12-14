@@ -2,6 +2,8 @@ using ParliamentAbsenceVisualizer.Api.Services;
 using ParliamentAbsenceVisualizer.Api.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.AspNetCore.ResponseCompression;
+using System.IO.Compression;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +32,24 @@ builder.Services.AddMemoryCache(options =>
 
 // Add response caching for images
 builder.Services.AddResponseCaching();
+
+// Configure response compression with Brotli
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.Providers.Add<BrotliCompressionProvider>();
+    options.Providers.Add<GzipCompressionProvider>();
+});
+
+builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
+{
+    options.Level = CompressionLevel.Fastest; // Balance between speed and size
+});
+
+builder.Services.Configure<GzipCompressionProviderOptions>(options =>
+{
+    options.Level = CompressionLevel.Fastest;
+});
 
 // Configure CORS for development
 builder.Services.AddCors(options =>
@@ -68,6 +88,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
     app.UseCors();
+}
+else
+{
+    // Enable response compression in production
+    app.UseResponseCompression();
 }
 
 // Serve static files from wwwroot (where Vite builds the React app)
