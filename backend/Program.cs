@@ -43,12 +43,12 @@ builder.Services.AddResponseCompression(options =>
 
 builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
 {
-    options.Level = CompressionLevel.Fastest; // Balance between speed and size
+    options.Level = CompressionLevel.Optimal; // Best compression for static files
 });
 
 builder.Services.Configure<GzipCompressionProviderOptions>(options =>
 {
-    options.Level = CompressionLevel.Fastest;
+    options.Level = CompressionLevel.Optimal; // Best compression for static files
 });
 
 // Configure CORS for development
