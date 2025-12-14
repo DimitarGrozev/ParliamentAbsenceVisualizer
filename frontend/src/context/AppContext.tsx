@@ -2,12 +2,16 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import type { Assembly } from '../types/assembly';
 import type { Party } from '../types/party';
 import type { Member } from '../types/member';
-import { fetchAssembly, fetchMembers } from '../services/api';
+import type { Absence, EnrichedAbsence } from '../types/absence';
+import { fetchAssembly, fetchMembers, fetchAbsences } from '../services/api';
+import { enrichAbsences } from '../utils/aggregations';
+import { preloadImages } from '../utils/imagePreloader';
 
 interface AppContextType {
   assembly: Assembly | null;
   parties: Party[];
   members: Member[];
+  allAbsences: EnrichedAbsence[];
   loading: boolean;
   error: string | null;
 }
@@ -27,6 +31,7 @@ export function AppProvider({ children }: AppProviderProps) {
   const [assembly, setAssembly] = useState<Assembly | null>(null);
   const [parties, setParties] = useState<Party[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
+  const [allAbsences, setAllAbsences] = useState<EnrichedAbsence[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -63,9 +68,27 @@ export function AppProvider({ children }: AppProviderProps) {
 
         const partiesFromMembers = Array.from(uniquePartiesMap.values());
 
+        // Fetch ALL absences (no date constraints) for client-side filtering
+        const rawAbsences: Absence[] = await fetchAbsences({
+          search: 1,
+          date1: '', // Empty = no start date constraint
+          date2: '', // Empty = no end date constraint (get everything)
+          A_ns_MP_Name: '',
+        });
+
+        // Enrich absences with party and member information
+        const enrichedAbsences = enrichAbsences(rawAbsences, partiesFromMembers, membersData.colListMP);
+
         setAssembly(assemblyData);
         setParties(partiesFromMembers);
         setMembers(membersData.colListMP);
+        setAllAbsences(enrichedAbsences);
+
+        // Preload all unique member images in the background
+        const uniqueImageUrls = [...new Set(enrichedAbsences.map(a => a.memberImageUrl))];
+        preloadImages(uniqueImageUrls).catch(err => {
+          console.warn('Some images failed to preload:', err);
+        });
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to load initial data';
         setError(errorMessage);
@@ -82,6 +105,7 @@ export function AppProvider({ children }: AppProviderProps) {
     assembly,
     parties,
     members,
+    allAbsences,
     loading,
     error,
   };

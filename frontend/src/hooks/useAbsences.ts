@@ -1,74 +1,49 @@
-import { useState, useEffect } from 'react';
-import type { Absence, EnrichedAbsence, AbsenceRequest } from '../types/absence';
-import { fetchAbsences } from '../services/api';
-import { enrichAbsences } from '../utils/aggregations';
+import { useMemo } from 'react';
+import type { EnrichedAbsence } from '../types/absence';
 import { useAppContext } from '../context/AppContext';
 import type { DateRange } from '../utils/datePresets';
-import { preloadImages } from '../utils/imagePreloader';
 
 interface UseAbsencesResult {
   absences: EnrichedAbsence[];
   loading: boolean;
   error: string | null;
-  refetch: () => void;
 }
 
 /**
- * Custom hook to fetch absences for a given date range
- * Automatically enriches absences with party and member information
+ * Custom hook to filter absences for a given date range
+ * Uses cached absences from AppContext and filters client-side
+ * This eliminates API calls for date range changes after initial load
  */
 export function useAbsences(dateRange: DateRange): UseAbsencesResult {
-  const { parties, members } = useAppContext();
-  const [absences, setAbsences] = useState<EnrichedAbsence[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { allAbsences, loading, error } = useAppContext();
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      // Build request payload
-      const request: AbsenceRequest = {
-        search: 1,
-        date1: dateRange.date1,
-        date2: dateRange.date2,
-        A_ns_MP_Name: '', // No member filter for now
-      };
-
-      const rawAbsences: Absence[] = await fetchAbsences(request);
-
-      // Enrich absences with party and member information
-      const enrichedAbsences = enrichAbsences(rawAbsences, parties, members);
-
-      setAbsences(enrichedAbsences);
-
-      // Preload all unique member images in the background
-      const uniqueImageUrls = [...new Set(enrichedAbsences.map(a => a.memberImageUrl))];
-      preloadImages(uniqueImageUrls).catch(err => {
-        console.warn('Some images failed to preload:', err);
-      });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch absences';
-      setError(errorMessage);
-      console.error('Error fetching absences:', err);
-    } finally {
-      setLoading(false);
+  // Filter absences by date range client-side
+  const filteredAbsences = useMemo(() => {
+    // If no date constraints, return all
+    if (!dateRange.date1 && !dateRange.date2) {
+      return allAbsences;
     }
-  };
 
-  useEffect(() => {
-    // Only fetch if parties and members are loaded
-    if (parties.length > 0 && members.length > 0) {
-      fetchData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dateRange.date1, dateRange.date2, parties.length, members.length]);
+    return allAbsences.filter(absence => {
+      const absenceDate = absence.MP_Ab_date;
+
+      // Check start date constraint
+      if (dateRange.date1 && absenceDate < dateRange.date1) {
+        return false;
+      }
+
+      // Check end date constraint
+      if (dateRange.date2 && absenceDate > dateRange.date2) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [allAbsences, dateRange.date1, dateRange.date2]);
 
   return {
-    absences,
+    absences: filteredAbsences,
     loading,
     error,
-    refetch: fetchData,
   };
 }
