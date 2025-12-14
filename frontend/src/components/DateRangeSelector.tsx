@@ -12,7 +12,6 @@ import {
   getAssemblyRange,
   getCustomRange,
 } from '../utils/datePresets';
-import { useAppContext } from '../context/AppContext';
 
 interface DateRangeSelectorProps {
   dateRange: DateRange;
@@ -24,8 +23,7 @@ interface DateRangeSelectorProps {
  * Allows users to select predefined ranges or custom dates
  */
 export function DateRangeSelector({ dateRange, onChange }: DateRangeSelectorProps) {
-  const { assembly } = useAppContext();
-  const [startDate, setStartDate] = useState<Date | null>(new Date(dateRange.date1));
+  const [startDate, setStartDate] = useState<Date | null>(dateRange.date1 ? new Date(dateRange.date1) : null);
   const [endDate, setEndDate] = useState<Date | null>(new Date(dateRange.date2));
 
   const handlePresetClick = (preset: 'today' | 'week' | 'month' | 'assembly') => {
@@ -42,11 +40,11 @@ export function DateRangeSelector({ dateRange, onChange }: DateRangeSelectorProp
         newRange = getThisMonth();
         break;
       case 'assembly':
-        newRange = assembly ? getAssemblyRange(assembly.A_ns_C_date_F) : getToday();
+        newRange = getAssemblyRange(); // No start date, only end date (today)
         break;
     }
 
-    setStartDate(new Date(newRange.date1));
+    setStartDate(newRange.date1 ? new Date(newRange.date1) : null);
     setEndDate(new Date(newRange.date2));
     onChange(newRange);
   };

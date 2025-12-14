@@ -1,25 +1,30 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Box, Typography, CircularProgress, Alert } from '@mui/material';
 import { MainLayout } from './components/Layout/MainLayout';
-import { DateRangeSelector } from './components/DateRangeSelector';
+import { DynamicIslandNavbar } from './components/Layout/DynamicIslandNavbar';
 import { TopAbsentPartiesPanel } from './components/TopAbsentPartiesPanel';
 import { AbsentMembersList } from './components/AbsentMembersList';
 import { AppProvider, useAppContext } from './context/AppContext';
 import { useAbsences } from './hooks/useAbsences';
-import { getToday } from './utils/datePresets';
+import { getToday, getAssemblyRange } from './utils/datePresets';
 import { getTopAbsentPartiesByName } from './utils/aggregations';
 import { theme } from './theme';
 import type { DateRange } from './utils/datePresets';
 
 /**
  * Main dashboard component
- * Displays date selector, top absent parties, and absent members list
+ * Displays dynamic island navbar, top absent parties, and absent members list
  */
 function Dashboard() {
-  const { assembly, members, loading: contextLoading, error: contextError } = useAppContext();
+  const { members, loading: contextLoading, error: contextError } = useAppContext();
   const [dateRange, setDateRange] = useState<DateRange>(getToday());
   const { absences, loading: absencesLoading, error: absencesError } = useAbsences(dateRange);
+
+  // Set assembly date range as default on mount (no start date, only end date as today)
+  useEffect(() => {
+    setDateRange(getAssemblyRange());
+  }, []);
 
   // Calculate top 3 parties by grouping enriched absences by party name
   const topParties = useMemo(
@@ -58,24 +63,19 @@ function Dashboard() {
 
   return (
     <>
-      {/* Assembly Info */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" component="h2" gutterBottom>
-          {assembly?.A_ns_CL_value_short || assembly?.A_ns_CL_value}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Active Members: {assembly?.A_ns_C_active_count}
-        </Typography>
-      </Box>
-
-      {/* Date Range Selector */}
-      <DateRangeSelector dateRange={dateRange} onChange={setDateRange} />
+      {/* Dynamic Island Navbar */}
+      <DynamicIslandNavbar
+        dateRange={dateRange}
+        onDateRangeChange={setDateRange}
+      />
 
       {/* Top Absent Parties */}
-      <TopAbsentPartiesPanel parties={topParties} />
+      <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 0, sm: 2, md: 4 }, mt: 4 }}>
+        <TopAbsentPartiesPanel parties={topParties} />
+      </Box>
 
       {/* Absent Members Section */}
-      <Box sx={{ mb: 3 }}>
+      <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 0, sm: 2, md: 4 }, mb: 3 }}>
         <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
           Absent Members
         </Typography>

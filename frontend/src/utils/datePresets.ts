@@ -54,14 +54,14 @@ export function getThisMonth(): DateRange {
 }
 
 /**
- * Get assembly date range (assembly start date to today)
- * @param assemblyStartDate - Start date from A_ns_C_date_F in YYYY-MM-DD format
+ * Get assembly date range (no start date constraint, only end date as today)
+ * This fetches all absences from the beginning up to today
  */
-export function getAssemblyRange(assemblyStartDate: string): DateRange {
+export function getAssemblyRange(): DateRange {
   const today = new Date();
 
   return {
-    date1: assemblyStartDate,
+    date1: '', // Empty string means no start date constraint
     date2: formatDateForApi(today),
   };
 }
