@@ -1,4 +1,4 @@
-import { Box, Typography, CircularProgress, Alert, FormControlLabel, Switch, TextField } from '@mui/material';
+import { Box, Typography, CircularProgress, Alert, TextField } from '@mui/material';
 import { useState, useMemo } from 'react';
 import { AbsentMemberCard } from './AbsentMemberCard';
 import type { EnrichedAbsence } from '../types/absence';
@@ -15,11 +15,10 @@ interface AbsentMembersListProps {
 /**
  * Grid layout of absent member cards
  * Handles loading, error, and empty states
- * Supports aggregation toggle to group absences by member
+ * Always shows aggregated view grouped by member
  * Supports client-side name filtering
  */
 export function AbsentMembersList({ absences, loading, error }: AbsentMembersListProps) {
-  const [aggregateByMember, setAggregateByMember] = useState(false);
   const [nameFilter, setNameFilter] = useState('');
 
   // Filter absences by name (case-insensitive)
@@ -35,13 +34,11 @@ export function AbsentMembersList({ absences, loading, error }: AbsentMembersLis
     );
   }, [absences, nameFilter]);
 
-  // Prepare data based on aggregation toggle
+  // Aggregate filtered absences by member (always aggregated)
   // Must be before early returns to satisfy Rules of Hooks
   const displayData = useMemo(() => {
-    return aggregateByMember
-      ? aggregateAbsencesByMember(filteredAbsences)
-      : filteredAbsences;
-  }, [aggregateByMember, filteredAbsences]);
+    return aggregateAbsencesByMember(filteredAbsences);
+  }, [filteredAbsences]);
 
   // Loading state
   if (loading) {
@@ -92,10 +89,10 @@ export function AbsentMembersList({ absences, loading, error }: AbsentMembersLis
     );
   }
 
-  // Display toggle and grid of absent members
+  // Display grid of aggregated member cards
   return (
     <Box>
-      {/* Controls: Search and Toggle */}
+      {/* Controls: Search */}
       <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
         {/* Search by name */}
         <TextField
@@ -113,20 +110,8 @@ export function AbsentMembersList({ absences, loading, error }: AbsentMembersLis
 
         {/* Results count */}
         <Typography variant="body2" color="text.secondary" sx={{ ml: 'auto' }}>
-          {displayData.length} result{displayData.length !== 1 ? 's' : ''}
+          {displayData.length} member{displayData.length !== 1 ? 's' : ''}
         </Typography>
-
-        {/* Toggle for aggregation */}
-        <FormControlLabel
-          control={
-            <Switch
-              checked={aggregateByMember}
-              onChange={(e) => setAggregateByMember(e.target.checked)}
-              color="primary"
-            />
-          }
-          label="Group by member"
-        />
       </Box>
 
       {/* Grid of cards or empty state */}
@@ -145,7 +130,7 @@ export function AbsentMembersList({ absences, loading, error }: AbsentMembersLis
         >
           {displayData.map((item) => (
             <AbsentMemberCard
-              key={'absenceCount' in item ? item.A_ns_MP_id : item.MP_Ab_id}
+              key={item.A_ns_MP_id}
               absence={item}
             />
           ))}

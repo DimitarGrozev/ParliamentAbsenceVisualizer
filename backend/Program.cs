@@ -1,4 +1,7 @@
 using ParliamentAbsenceVisualizer.Api.Services;
+using ParliamentAbsenceVisualizer.Api.Configuration;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Caching.Memory;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +9,24 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Configure cache settings from appsettings.json
+builder.Services.Configure<CacheSettings>(
+    builder.Configuration.GetSection(CacheSettings.SectionName));
+
+// Register IMemoryCache with size limits
+builder.Services.AddMemoryCache(options =>
+{
+    var cacheSettings = builder.Configuration
+        .GetSection(CacheSettings.SectionName)
+        .Get<CacheSettings>() ?? new CacheSettings();
+
+    // Set size limit (convert MB to bytes)
+    options.SizeLimit = cacheSettings.MaxCacheSizeInMegabytes * 1024 * 1024;
+
+    // Compact cache when 75% full
+    options.CompactionPercentage = 0.25;
+});
 
 // Add response caching for images
 builder.Services.AddResponseCaching();
@@ -21,8 +42,23 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Register HttpClient for Parliament API
-builder.Services.AddHttpClient<IParliamentApiService, ParliamentApiService>();
+// Register HttpClient and services with decorator pattern
+builder.Services.AddHttpClient<ParliamentApiService>();
+builder.Services.AddScoped<IParliamentApiService>(sp =>
+{
+    // Get HttpClientFactory and create real service
+    var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
+    var httpClient = httpClientFactory.CreateClient(nameof(ParliamentApiService));
+    var logger = sp.GetRequiredService<ILogger<ParliamentApiService>>();
+    var realService = new ParliamentApiService(httpClient, logger);
+
+    // Wrap it with caching decorator
+    var cache = sp.GetRequiredService<IMemoryCache>();
+    var cacheSettings = sp.GetRequiredService<IOptions<CacheSettings>>();
+    var cacheLogger = sp.GetRequiredService<ILogger<CachedParliamentApiService>>();
+
+    return new CachedParliamentApiService(realService, cache, cacheSettings, cacheLogger);
+});
 
 var app = builder.Build();
 
