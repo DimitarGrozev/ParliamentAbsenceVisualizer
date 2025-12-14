@@ -19,9 +19,10 @@ public class ImagesController : ControllerBase
     }
 
     /// <summary>
-    /// Proxy member image from parliament.bg
+    /// Proxy member image from parliament.bg with aggressive caching
     /// </summary>
     [HttpGet("Assembly/{memberId}.png")]
+    [ResponseCache(Duration = 86400, Location = ResponseCacheLocation.Any)] // Cache for 24 hours
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -30,6 +31,11 @@ public class ImagesController : ControllerBase
         try
         {
             var imageBytes = await _parliamentApiService.GetMemberImageAsync(memberId);
+
+            // Add cache control headers for browser caching
+            Response.Headers.CacheControl = "public, max-age=86400"; // 24 hours
+            Response.Headers.Expires = DateTime.UtcNow.AddDays(1).ToString("R");
+
             return File(imageBytes, "image/png");
         }
         catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)

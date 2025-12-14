@@ -77,7 +77,61 @@ export function aggregateAbsencesByParty(absences: Absence[]): Record<number, nu
 }
 
 /**
- * Get top N parties by total absence count
+ * Get top N parties by total absence count (using enriched absences with party names)
+ * @param absences - List of enriched absences
+ * @param members - List of all members (to calculate party size)
+ * @param limit - Number of top parties to return (default: 3)
+ */
+export function getTopAbsentPartiesByName(
+  absences: EnrichedAbsence[],
+  members: Member[],
+  limit = 3
+): PartyWithAbsences[] {
+  // Group absences by party name
+  const partyAbsenceMap = new Map<string, { partyName: string; partyId: number; count: number }>();
+
+  absences.forEach(absence => {
+    const partyName = absence.partyName || 'Unknown';
+    const existing = partyAbsenceMap.get(partyName);
+
+    if (existing) {
+      existing.count++;
+    } else {
+      partyAbsenceMap.set(partyName, {
+        partyName,
+        partyId: absence.A_ns_C_id,
+        count: 1,
+      });
+    }
+  });
+
+  // Count members per party
+  const memberCountByPartyName = new Map<string, number>();
+  members.forEach(member => {
+    const partyName = member.A_ns_CL_value;
+    memberCountByPartyName.set(partyName, (memberCountByPartyName.get(partyName) || 0) + 1);
+  });
+
+  // Convert to PartyWithAbsences array
+  const partiesWithAbsences: PartyWithAbsences[] = Array.from(partyAbsenceMap.values())
+    .map(party => ({
+      A_ns_C_id: party.partyId,
+      A_ns_CT_id: 2,
+      A_ns_CL_value: party.partyName,
+      A_ns_C_active_count: memberCountByPartyName.get(party.partyName) || 0,
+      A_ns_C_date_F: '',
+      A_ns_C_date_T: '',
+      absenceCount: party.count,
+    }));
+
+  // Sort by absence count (descending) and take top N
+  return partiesWithAbsences
+    .sort((a, b) => b.absenceCount - a.absenceCount)
+    .slice(0, limit);
+}
+
+/**
+ * Get top N parties by total absence count (legacy ID-based approach)
  * @param absences - List of absences
  * @param parties - List of all parties
  * @param limit - Number of top parties to return (default: 3)

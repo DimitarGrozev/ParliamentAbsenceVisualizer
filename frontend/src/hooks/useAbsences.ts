@@ -4,6 +4,7 @@ import { fetchAbsences } from '../services/api';
 import { enrichAbsences } from '../utils/aggregations';
 import { useAppContext } from '../context/AppContext';
 import type { DateRange } from '../utils/datePresets';
+import { preloadImages } from '../utils/imagePreloader';
 
 interface UseAbsencesResult {
   absences: EnrichedAbsence[];
@@ -41,6 +42,12 @@ export function useAbsences(dateRange: DateRange): UseAbsencesResult {
       const enrichedAbsences = enrichAbsences(rawAbsences, parties, members);
 
       setAbsences(enrichedAbsences);
+
+      // Preload all unique member images in the background
+      const uniqueImageUrls = [...new Set(enrichedAbsences.map(a => a.memberImageUrl))];
+      preloadImages(uniqueImageUrls).catch(err => {
+        console.warn('Some images failed to preload:', err);
+      });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch absences';
       setError(errorMessage);
@@ -51,9 +58,12 @@ export function useAbsences(dateRange: DateRange): UseAbsencesResult {
   };
 
   useEffect(() => {
-    fetchData();
+    // Only fetch if parties and members are loaded
+    if (parties.length > 0 && members.length > 0) {
+      fetchData();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dateRange.date1, dateRange.date2]);
+  }, [dateRange.date1, dateRange.date2, parties.length, members.length]);
 
   return {
     absences,

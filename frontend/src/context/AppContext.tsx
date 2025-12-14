@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import type { Assembly } from '../types/assembly';
 import type { Party } from '../types/party';
 import type { Member } from '../types/member';
-import { fetchAssembly, fetchParties, fetchMembers } from '../services/api';
+import { fetchAssembly, fetchMembers } from '../services/api';
 
 interface AppContextType {
   assembly: Assembly | null;
@@ -36,15 +36,35 @@ export function AppProvider({ children }: AppProviderProps) {
         setLoading(true);
         setError(null);
 
-        // Fetch all data in parallel
-        const [assemblyData, partiesData, membersData] = await Promise.all([
+        // Fetch assembly and members data
+        const [assemblyData, membersData] = await Promise.all([
           fetchAssembly(),
-          fetchParties(),
           fetchMembers(),
         ]);
 
+        // Extract unique parties from members (more accurate than /coll-list/bg/2)
+        // This ensures party IDs match those in absence records
+        const uniquePartiesMap = new Map<number, Party>();
+        membersData.colListMP.forEach(member => {
+          if (!uniquePartiesMap.has(member.A_ns_C_id)) {
+            uniquePartiesMap.set(member.A_ns_C_id, {
+              A_ns_C_id: member.A_ns_C_id,
+              A_ns_CT_id: 2, // Parliamentary group type
+              A_ns_CL_value: member.A_ns_CL_value,
+              A_ns_C_active_count: 0, // Will be calculated
+              A_ns_C_date_F: member.A_ns_MSP_date_F,
+              A_ns_C_date_T: member.A_ns_MSP_date_T,
+            });
+          }
+          // Count active members per party
+          const party = uniquePartiesMap.get(member.A_ns_C_id)!;
+          party.A_ns_C_active_count++;
+        });
+
+        const partiesFromMembers = Array.from(uniquePartiesMap.values());
+
         setAssembly(assemblyData);
-        setParties(partiesData);
+        setParties(partiesFromMembers);
         setMembers(membersData.colListMP);
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to load initial data';

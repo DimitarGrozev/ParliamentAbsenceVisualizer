@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Box, Typography, CircularProgress, Alert } from '@mui/material';
 import { MainLayout } from './components/Layout/MainLayout';
@@ -8,7 +8,7 @@ import { AbsentMembersList } from './components/AbsentMembersList';
 import { AppProvider, useAppContext } from './context/AppContext';
 import { useAbsences } from './hooks/useAbsences';
 import { getToday } from './utils/datePresets';
-import { getTopAbsentParties } from './utils/aggregations';
+import { getTopAbsentPartiesByName } from './utils/aggregations';
 import { theme } from './theme';
 import type { DateRange } from './utils/datePresets';
 
@@ -17,13 +17,15 @@ import type { DateRange } from './utils/datePresets';
  * Displays date selector, top absent parties, and absent members list
  */
 function Dashboard() {
-  const { assembly, parties, loading: contextLoading, error: contextError } = useAppContext();
+  const { assembly, members, loading: contextLoading, error: contextError } = useAppContext();
   const [dateRange, setDateRange] = useState<DateRange>(getToday());
   const { absences, loading: absencesLoading, error: absencesError } = useAbsences(dateRange);
 
-  // Calculate top 3 parties
-  const topParties = getTopAbsentParties(absences, parties, 3);
-
+  // Calculate top 3 parties by grouping enriched absences by party name
+  const topParties = useMemo(
+    () => getTopAbsentPartiesByName(absences, members, 3),
+    [absences, members]
+  );
   // Show loading state while initial data loads
   if (contextLoading) {
     return (

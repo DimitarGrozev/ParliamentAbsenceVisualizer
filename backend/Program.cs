@@ -7,6 +7,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Add response caching for images
+builder.Services.AddResponseCaching();
+
 // Configure CORS for development
 builder.Services.AddCors(options =>
 {
@@ -34,6 +37,9 @@ if (app.Environment.IsDevelopment())
 // Serve static files from wwwroot (where Vite builds the React app)
 app.UseDefaultFiles();
 app.UseStaticFiles();
+
+// Enable response caching middleware
+app.UseResponseCaching();
 
 app.UseHttpsRedirection();
 app.MapControllers();
