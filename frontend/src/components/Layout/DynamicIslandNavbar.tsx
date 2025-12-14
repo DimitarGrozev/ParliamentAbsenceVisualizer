@@ -91,17 +91,25 @@ export function DynamicIslandNavbar({
   };
 
   const handleStartDateChange = (date: Date | null) => {
+    setStartDate(date);
     if (date && endDate) {
-      setStartDate(date);
       onDateRangeChange(getCustomRange(date, endDate));
+      setActivePreset('');
+    } else if (!date && endDate) {
+      // If clearing start date, use assembly range (no start, only end)
+      onDateRangeChange({ date1: '', date2: endDate.toISOString().split('T')[0] });
       setActivePreset('');
     }
   };
 
   const handleEndDateChange = (date: Date | null) => {
+    setEndDate(date);
     if (date && startDate) {
-      setEndDate(date);
       onDateRangeChange(getCustomRange(startDate, date));
+      setActivePreset('');
+    } else if (date && !startDate) {
+      // If no start date, use assembly range (no start, only end)
+      onDateRangeChange({ date1: '', date2: date.toISOString().split('T')[0] });
       setActivePreset('');
     }
   };
@@ -220,9 +228,11 @@ export function DynamicIslandNavbar({
                   label="From"
                   value={startDate}
                   onChange={handleStartDateChange}
+                  format="dd/MM/yyyy"
                   slotProps={{
                     textField: {
                       size: 'small',
+                      placeholder: 'DD/MM/YYYY',
                       sx: {
                         flex: 1,
                         minWidth: 0,
@@ -250,6 +260,10 @@ export function DynamicIslandNavbar({
                         },
                       },
                     },
+                    field: {
+                      clearable: true,
+                      onClear: () => handleStartDateChange(null),
+                    },
                   }}
                 />
                 <DatePicker
@@ -257,9 +271,11 @@ export function DynamicIslandNavbar({
                   value={endDate}
                   onChange={handleEndDateChange}
                   minDate={startDate || undefined}
+                  format="dd/MM/yyyy"
                   slotProps={{
                     textField: {
                       size: 'small',
+                      placeholder: 'DD/MM/YYYY',
                       sx: {
                         flex: 1,
                         minWidth: 0,
@@ -286,6 +302,10 @@ export function DynamicIslandNavbar({
                           fontSize: '1.25rem',
                         },
                       },
+                    },
+                    field: {
+                      clearable: true,
+                      onClear: () => handleEndDateChange(null),
                     },
                   }}
                 />
