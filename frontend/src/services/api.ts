@@ -64,18 +64,11 @@ export async function fetchMembers(): Promise<MembersResponse> {
 
 /**
  * Fetch absences for a given date range and assembly
+ * Each absence now includes a direct memberImageUrl from parliament.bg
  */
 export async function fetchAbsences(request: AbsenceRequest): Promise<Absence[]> {
   return apiFetch<Absence[]>(`${BASE_URL}/mp-absense/bg`, {
     method: 'POST',
     body: JSON.stringify(request),
   });
-}
-
-/**
- * Generate member image URL from member ID
- * Uses relative URL that proxies through .NET backend to parliament.bg
- */
-export function getMemberImageUrl(memberId: number): string {
-  return `/images/Assembly/${memberId}.png`;
 }

@@ -11,6 +11,7 @@ export interface Absence {
   A_ns_MPL_Name3: string;    // Last name
   A_ns_CL_value: string;     // Assembly or commission name
   A_ns_C_id: number;         // Party ID
+  memberImageUrl: string;    // Direct URL to member image from parliament.bg
 }
 
 // Enriched absence data with member and party information

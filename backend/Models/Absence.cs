@@ -30,4 +30,7 @@ public class Absence
 
     [JsonPropertyName("A_ns_C_id")]
     public int A_ns_C_id { get; set; }
+
+    [JsonPropertyName("memberImageUrl")]
+    public string MemberImageUrl { get; set; } = string.Empty;
 }

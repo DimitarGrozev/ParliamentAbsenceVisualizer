@@ -96,6 +96,13 @@ public class ParliamentController : ControllerBase
             }
 
             var absences = await _parliamentApiService.GetAbsencesAsync(request);
+
+            // Add direct image URLs for each absence
+            foreach (var absence in absences)
+            {
+                absence.MemberImageUrl = $"https://www.parliament.bg/images/Assembly/{absence.A_ns_MP_id}.png";
+            }
+
             return Ok(absences);
         }
         catch (Exception ex)

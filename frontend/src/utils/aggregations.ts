@@ -1,7 +1,6 @@
 import type { Absence, EnrichedAbsence, AggregatedMemberAbsence } from '../types/absence';
 import type { Party, PartyWithAbsences } from '../types/party';
 import type { Member } from '../types/member';
-import { getMemberImageUrl } from '../services/api';
 
 /**
  * Enrich absence data with party information
@@ -16,7 +15,6 @@ export function enrichAbsenceWithPartyInfo(
     ...absence,
     partyName: party?.A_ns_CL_value,
     partyShortName: party?.A_ns_CL_value,
-    memberImageUrl: getMemberImageUrl(absence.A_ns_MP_id),
     fullName: `${absence.A_ns_MPL_Name1} ${absence.A_ns_MPL_Name2} ${absence.A_ns_MPL_Name3}`.trim(),
   };
 }
@@ -34,7 +32,6 @@ export function enrichAbsenceWithMemberInfo(
     ...absence,
     partyName: member?.A_ns_CL_value,
     partyShortName: member?.A_ns_CL_value_short,
-    memberImageUrl: getMemberImageUrl(absence.A_ns_MP_id),
     fullName: `${absence.A_ns_MPL_Name1} ${absence.A_ns_MPL_Name2} ${absence.A_ns_MPL_Name3}`.trim(),
   };
 }
@@ -55,7 +52,6 @@ export function enrichAbsences(
       ...absence,
       partyName: party?.A_ns_CL_value || member?.A_ns_CL_value,
       partyShortName: party?.A_ns_CL_value || member?.A_ns_CL_value_short,
-      memberImageUrl: getMemberImageUrl(absence.A_ns_MP_id),
       fullName: `${absence.A_ns_MPL_Name1} ${absence.A_ns_MPL_Name2} ${absence.A_ns_MPL_Name3}`.trim(),
     };
   });
