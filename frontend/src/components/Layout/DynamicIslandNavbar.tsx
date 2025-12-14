@@ -157,8 +157,10 @@ export function DynamicIslandNavbar({
               <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
                 <CalendarTodayIcon sx={{ fontSize: 18, color: alpha('#fff', 0.8) }} />
                 <Box sx={{ color: 'white', fontSize: 13, fontWeight: 500 }}>
-                  {new Date(dateRange.date1).toLocaleDateString('bg-BG', { month: 'short', day: 'numeric' })}
-                  {' - '}
+                  {dateRange.date1
+                    ? new Date(dateRange.date1).toLocaleDateString('bg-BG', { month: 'short', day: 'numeric' })
+                    : 'From'}
+                    {' - '}
                   {new Date(dateRange.date2).toLocaleDateString('bg-BG', { month: 'short', day: 'numeric' })}
                 </Box>
               </Box>

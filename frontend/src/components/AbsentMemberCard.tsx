@@ -1,4 +1,4 @@
-import { Card, CardContent, CardMedia, Typography, Box, Avatar, Chip, Badge } from '@mui/material';
+import { Card, CardContent, CardMedia, Typography, Box, Avatar, Chip } from '@mui/material';
 import { useState } from 'react';
 import type { EnrichedAbsence, AggregatedMemberAbsence } from '../types/absence';
 import { getMemberInitials } from '../utils/aggregations';
@@ -44,68 +44,47 @@ export function AbsentMemberCard({ absence, onClick }: AbsentMemberCardProps) {
       }}
       onClick={onClick}
     >
-      {/* Member Photo with optional badge */}
-      <Badge
-        badgeContent={aggregated ? absence.absenceCount : null}
-        color="error"
-        overlap="circular"
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
+      {/* Member Photo */}
+      <Box
         sx={{
+          position: 'relative',
+          paddingTop: '100%', // 1:1 Aspect ratio
+          backgroundColor: 'grey.200',
           width: '100%',
-          '& .MuiBadge-badge': {
-            fontSize: '1rem',
-            height: '32px',
-            minWidth: '32px',
-            borderRadius: '16px',
-            top: '12px',
-            right: '12px',
-          },
         }}
       >
-        <Box
-          sx={{
-            position: 'relative',
-            paddingTop: '100%', // 1:1 Aspect ratio
-            backgroundColor: 'grey.200',
-            width: '100%',
-          }}
-        >
-          {!imageError ? (
-            <CardMedia
-              component="img"
-              image={absence.memberImageUrl}
-              alt={absence.fullName}
-              onError={handleImageError}
-              sx={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-              }}
-            />
-          ) : (
-            <Avatar
-              sx={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: 80,
-                height: 80,
-                fontSize: '2rem',
-                bgcolor: 'primary.main',
-              }}
-            >
-              {getMemberInitials(absence)}
-            </Avatar>
-          )}
-        </Box>
-      </Badge>
+        {!imageError ? (
+          <CardMedia
+            component="img"
+            image={absence.memberImageUrl}
+            alt={absence.fullName}
+            onError={handleImageError}
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+            }}
+          />
+        ) : (
+          <Avatar
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 80,
+              height: 80,
+              fontSize: '2rem',
+              bgcolor: 'primary.main',
+            }}
+          >
+            {getMemberInitials(absence)}
+          </Avatar>
+        )}
+      </Box>
 
       {/* Member Information */}
       <CardContent sx={{ flexGrow: 1 }}>
