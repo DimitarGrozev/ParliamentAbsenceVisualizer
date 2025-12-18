@@ -10,6 +10,7 @@ public interface IParliamentApiService
     Task<MembersResponse> GetMembersAsync();
     Task<List<Absence>> GetAbsencesAsync(AbsenceRequest request);
     Task<byte[]> GetMemberImageAsync(int memberId);
+    Task<MemberProfile> GetMemberProfileAsync(int memberId);
 }
 
 public class ParliamentApiService : IParliamentApiService
@@ -134,6 +135,34 @@ public class ParliamentApiService : IParliamentApiService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error fetching member image for ID {MemberId}", memberId);
+            throw;
+        }
+    }
+
+    public async Task<MemberProfile> GetMemberProfileAsync(int memberId)
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync($"{BASE_URL}/mp-profile/bg/{memberId}");
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            var profile = JsonSerializer.Deserialize<MemberProfile>(content, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = false // Parliament API uses exact case-sensitive property names
+            });
+
+            if (profile == null)
+            {
+                throw new Exception($"Failed to deserialize member profile for member ID {memberId}");
+            }
+
+            return profile;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching member profile for ID {MemberId}", memberId);
             throw;
         }
     }

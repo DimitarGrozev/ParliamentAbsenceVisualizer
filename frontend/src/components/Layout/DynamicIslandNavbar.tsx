@@ -43,6 +43,12 @@ export function DynamicIslandNavbar({
   const [endDate, setEndDate] = useState<Date | null>(new Date(dateRange.date2));
   const [activePreset, setActivePreset] = useState<string>('assembly');
 
+  // Sync internal state when dateRange prop changes
+  useEffect(() => {
+    setStartDate(dateRange.date1 ? new Date(dateRange.date1) : null);
+    setEndDate(new Date(dateRange.date2));
+  }, [dateRange]);
+
   // Handle scroll to expand/contract navbar
   useEffect(() => {
     const handleScroll = () => {

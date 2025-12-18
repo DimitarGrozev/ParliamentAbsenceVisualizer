@@ -21,6 +21,7 @@ public class CachedParliamentApiService : IParliamentApiService
     private const string PARTIES_CACHE_KEY = "parliament:parties:all";
     private const string MEMBERS_CACHE_KEY = "parliament:members:all";
     private const string ABSENCES_CACHE_KEY_PREFIX = "parliament:absences";
+    private const string MEMBER_PROFILE_CACHE_KEY_PREFIX = "parliament:member-profile";
 
     public CachedParliamentApiService(
         IParliamentApiService innerService,
@@ -66,6 +67,7 @@ public class CachedParliamentApiService : IParliamentApiService
 
     public async Task<List<Absence>> GetAbsencesAsync(AbsenceRequest request)
     {
+        return await _innerService.GetAbsencesAsync(request);
         var cacheKey = GenerateAbsenceCacheKey(request);
         return await GetOrCreateAsync(
             cacheKey,
@@ -81,6 +83,17 @@ public class CachedParliamentApiService : IParliamentApiService
         // Controller sets direct image URLs, so this method likely isn't heavily used
         // Can add caching here if needed, but images rarely change
         return await _innerService.GetMemberImageAsync(memberId);
+    }
+
+    public async Task<MemberProfile> GetMemberProfileAsync(int memberId)
+    {
+        var cacheKey = $"{MEMBER_PROFILE_CACHE_KEY_PREFIX}:{memberId}";
+        return await GetOrCreateAsync(
+            cacheKey,
+            () => _innerService.GetMemberProfileAsync(memberId),
+            TimeSpan.FromMinutes(_cacheSettings.MembersCacheDurationMinutes), // Use same duration as members
+            $"Member Profile (ID: {memberId})"
+        );
     }
 
     /// <summary>

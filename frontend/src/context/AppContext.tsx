@@ -12,6 +12,7 @@ interface AppContextType {
   parties: Party[];
   members: Member[];
   allAbsences: EnrichedAbsence[];
+  earliestAbsenceDate: string | null; // YYYY-MM-DD format of earliest loaded absence
   loading: boolean;
   error: string | null;
 }
@@ -32,6 +33,7 @@ export function AppProvider({ children }: AppProviderProps) {
   const [parties, setParties] = useState<Party[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
   const [allAbsences, setAllAbsences] = useState<EnrichedAbsence[]>([]);
+  const [earliestAbsenceDate, setEarliestAbsenceDate] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -68,21 +70,33 @@ export function AppProvider({ children }: AppProviderProps) {
 
         const partiesFromMembers = Array.from(uniquePartiesMap.values());
 
-        // Fetch ALL absences (no date constraints) for client-side filtering
+        // Fetch ALL absences using the full assembly date range
+        // Using empty dates hits API limits (returns only ~1000 records)
+        // Instead, use the assembly start date to current date to get all records
         const rawAbsences: Absence[] = await fetchAbsences({
           search: 1,
-          date1: '', // Empty = no start date constraint
-          date2: '', // Empty = no end date constraint (get everything)
+          date1: assemblyData.A_ns_C_date_F, // Assembly start date
+          date2: new Date().toISOString().split('T')[0], // Today's date (YYYY-MM-DD)
           A_ns_MP_Name: '',
         });
 
         // Enrich absences with party and member information
         const enrichedAbsences = enrichAbsences(rawAbsences, partiesFromMembers, membersData.colListMP);
 
+        // Find the earliest absence date from the loaded data
+        // This shows users the actual data range when API hits its 1000 record limit
+        let earliestDate: string | null = null;
+        if (enrichedAbsences.length > 0) {
+          earliestDate = enrichedAbsences.reduce((earliest, absence) => {
+            return absence.MP_Ab_date < earliest ? absence.MP_Ab_date : earliest;
+          }, enrichedAbsences[0].MP_Ab_date);
+        }
+
         setAssembly(assemblyData);
         setParties(partiesFromMembers);
         setMembers(membersData.colListMP);
         setAllAbsences(enrichedAbsences);
+        setEarliestAbsenceDate(earliestDate);
 
         // Preload all unique member images in the background
         const uniqueImageUrls = [...new Set(enrichedAbsences.map(a => a.memberImageUrl))];
@@ -106,6 +120,7 @@ export function AppProvider({ children }: AppProviderProps) {
     parties,
     members,
     allAbsences,
+    earliestAbsenceDate,
     loading,
     error,
   };

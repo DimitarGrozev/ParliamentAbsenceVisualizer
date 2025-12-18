@@ -1,5 +1,6 @@
 import { Box, Typography, CircularProgress, Alert, TextField } from '@mui/material';
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AbsentMemberCard } from './AbsentMemberCard';
 import type { EnrichedAbsence } from '../types/absence';
 import { aggregateAbsencesByMember } from '../utils/aggregations';
@@ -19,6 +20,7 @@ interface AbsentMembersListProps {
  * Supports client-side name filtering
  */
 export function AbsentMembersList({ absences, loading, error }: AbsentMembersListProps) {
+  const navigate = useNavigate();
   const [nameFilter, setNameFilter] = useState('');
 
   // Filter absences by name (case-insensitive)
@@ -132,6 +134,7 @@ export function AbsentMembersList({ absences, loading, error }: AbsentMembersLis
             <AbsentMemberCard
               key={item.A_ns_MP_id}
               absence={item}
+              onClick={() => navigate(`/member/${item.A_ns_MP_id}`)}
             />
           ))}
         </Box>
