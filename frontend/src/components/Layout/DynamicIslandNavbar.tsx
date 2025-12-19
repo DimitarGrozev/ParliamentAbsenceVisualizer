@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Collapse,
@@ -49,6 +49,7 @@ export function DynamicIslandNavbar({
   const [endDate, setEndDate] = useState<Date | null>(dateRange.date2 ? new Date(dateRange.date2) : null);
   const [activePreset, setActivePreset] = useState<string>('assembly');
   const [isSearching, setIsSearching] = useState(false);
+  const searchButtonRef = useRef<HTMLButtonElement | null>(null);
 
   // Sync internal state when dateRange prop changes
   useEffect(() => {
@@ -150,6 +151,7 @@ export function DynamicIslandNavbar({
     } catch (error) {
       console.error('Error searching absences:', error);
     } finally {
+      searchButtonRef.current?.blur();
       setIsSearching(false);
     }
   };
@@ -415,8 +417,9 @@ export function DynamicIslandNavbar({
                 />
 
                 {/* Search Button */}
-                <Tooltip title="Search absences for selected date range">
+                <Tooltip title="">
                   <IconButton
+                    ref={searchButtonRef}
                     onClick={handleSearch}
                     disabled={isSearching}
                     sx={{
