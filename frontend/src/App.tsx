@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Box, Typography, CircularProgress, Alert } from '@mui/material';
@@ -8,7 +8,6 @@ import { TopAbsentPartiesPanel } from './components/TopAbsentPartiesPanel';
 import { AbsentMembersList } from './components/AbsentMembersList';
 import { AppProvider, useAppContext } from './context/AppContext';
 import { useAbsences } from './hooks/useAbsences';
-import { getToday, getCustomRange } from './utils/datePresets';
 import { getTopAbsentPartiesByName } from './utils/aggregations';
 import { theme } from './theme';
 import type { DateRange } from './utils/datePresets';
@@ -19,17 +18,9 @@ import MemberDetailPage from './pages/MemberDetailPage';
  * Displays dynamic island navbar, top absent parties, and absent members list
  */
 function Dashboard() {
-  const { members, earliestAbsenceDate, loading: contextLoading, error: contextError } = useAppContext();
-  const [dateRange, setDateRange] = useState<DateRange>(getToday());
+  const { members, loading: contextLoading, error: contextError } = useAppContext();
+  const [dateRange, setDateRange] = useState<DateRange>({ date1: '', date2: '' });
   const { absences, loading: absencesLoading, error: absencesError } = useAbsences(dateRange);
-
-  // Set date range to show actual loaded data range on mount
-  // Uses earliest absence date (due to API 1000 record limit) to today
-  useEffect(() => {
-    if (earliestAbsenceDate) {
-      setDateRange(getCustomRange(new Date(earliestAbsenceDate), new Date()));
-    }
-  }, [earliestAbsenceDate]);
 
   // Calculate top 3 parties by grouping enriched absences by party name
   const topParties = useMemo(

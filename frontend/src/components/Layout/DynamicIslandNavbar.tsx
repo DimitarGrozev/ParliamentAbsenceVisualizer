@@ -6,6 +6,9 @@ import {
   Chip,
   useTheme,
   alpha,
+  IconButton,
+  Tooltip,
+  TextField,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -13,7 +16,9 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { bg } from 'date-fns/locale';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import SearchIcon from '@mui/icons-material/Search';
 import type { DateRange } from '../../utils/datePresets';
+import { useAppContext } from '../../context/AppContext';
 import {
   getToday,
   getThisWeek,
@@ -37,16 +42,18 @@ export function DynamicIslandNavbar({
   onDateRangeChange,
 }: DynamicIslandNavbarProps) {
   const theme = useTheme();
+  const { refetchAbsences, memberNameFilter, setMemberNameFilter } = useAppContext();
   const [isExpanded, setIsExpanded] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [startDate, setStartDate] = useState<Date | null>(dateRange.date1 ? new Date(dateRange.date1) : null);
-  const [endDate, setEndDate] = useState<Date | null>(new Date(dateRange.date2));
+  const [endDate, setEndDate] = useState<Date | null>(dateRange.date2 ? new Date(dateRange.date2) : null);
   const [activePreset, setActivePreset] = useState<string>('assembly');
+  const [isSearching, setIsSearching] = useState(false);
 
   // Sync internal state when dateRange prop changes
   useEffect(() => {
     setStartDate(dateRange.date1 ? new Date(dateRange.date1) : null);
-    setEndDate(new Date(dateRange.date2));
+    setEndDate(dateRange.date2 ? new Date(dateRange.date2) : null);
   }, [dateRange]);
 
   // Handle scroll to expand/contract navbar
@@ -72,7 +79,7 @@ export function DynamicIslandNavbar({
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
-  const handlePresetClick = (preset: 'today' | 'week' | 'month' | 'assembly') => {
+  const handlePresetClick = async (preset: 'today' | 'week' | 'month' | 'assembly') => {
     let newRange: DateRange;
 
     switch (preset) {
@@ -92,8 +99,18 @@ export function DynamicIslandNavbar({
 
     setStartDate(newRange.date1 ? new Date(newRange.date1) : null);
     setEndDate(new Date(newRange.date2));
-    onDateRangeChange(newRange);
     setActivePreset(preset);
+
+    // Automatically fetch data with new date range, preserving member name filter
+    setIsSearching(true);
+    try {
+      await refetchAbsences(newRange.date1, newRange.date2, memberNameFilter);
+      onDateRangeChange(newRange);
+    } catch (error) {
+      console.error('Error fetching absences for preset:', error);
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   const handleStartDateChange = (date: Date | null) => {
@@ -117,6 +134,23 @@ export function DynamicIslandNavbar({
       // If no start date, use assembly range (no start, only end)
       onDateRangeChange({ date1: '', date2: date.toISOString().split('T')[0] });
       setActivePreset('');
+    }
+  };
+
+  const handleSearch = async () => {
+    setIsSearching(true);
+    try {
+      const date1 = startDate ? startDate.toISOString().split('T')[0] : '';
+      const date2 = endDate ? endDate.toISOString().split('T')[0] : '';
+
+      await refetchAbsences(date1, date2, memberNameFilter);
+
+      // Update the date range in parent component
+      onDateRangeChange({ date1, date2 });
+    } catch (error) {
+      console.error('Error searching absences:', error);
+    } finally {
+      setIsSearching(false);
     }
   };
 
@@ -187,7 +221,7 @@ export function DynamicIslandNavbar({
             )}
           </Stack>
 
-          {/* Expanded Content - Single Row with Presets and Date Pickers */}
+          {/* Expanded Content - Single Row with Presets, Date Pickers, Member Name, and Search */}
           <Collapse in={isExpanded} timeout={400}>
             <Stack
               direction={{ xs: 'column', sm: 'row' }}
@@ -203,7 +237,7 @@ export function DynamicIslandNavbar({
                   { key: 'today', label: 'Today' },
                   { key: 'week', label: 'Week' },
                   { key: 'month', label: 'Month' },
-                  { key: 'assembly', label: 'All' },
+                  { key: 'assembly', label: 'Last 1000' },
                 ].map((preset) => (
                   <Chip
                     key={preset.key}
@@ -229,7 +263,7 @@ export function DynamicIslandNavbar({
               </Stack>
 
               {/* Date Pickers - Compact */}
-              <Stack direction="row" spacing={1} sx={{ flex: 1, minWidth: 0 }}>
+              <Stack direction="row" spacing={1} sx={{ flex: 1, minWidth: 0, alignItems: 'flex-start' }}>
                 <DatePicker
                   label="From"
                   value={startDate}
@@ -239,6 +273,7 @@ export function DynamicIslandNavbar({
                     textField: {
                       size: 'small',
                       placeholder: 'DD/MM/YYYY',
+                      error: false,
                       sx: {
                         flex: 1,
                         minWidth: 0,
@@ -276,12 +311,12 @@ export function DynamicIslandNavbar({
                   label="To"
                   value={endDate}
                   onChange={handleEndDateChange}
-                  minDate={startDate || undefined}
                   format="dd/MM/yyyy"
                   slotProps={{
                     textField: {
                       size: 'small',
                       placeholder: 'DD/MM/YYYY',
+                      error: false,
                       sx: {
                         flex: 1,
                         minWidth: 0,
@@ -315,6 +350,65 @@ export function DynamicIslandNavbar({
                     },
                   }}
                 />
+
+                {/* Member Name Search */}
+                <TextField
+                  label="Member Name"
+                  value={memberNameFilter}
+                  onChange={(e) => setMemberNameFilter(e.target.value)}
+                  placeholder="Search by name..."
+                  size="small"
+                  sx={{
+                    minWidth: 160,
+                    maxWidth: 180,
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: alpha('#fff', 0.1),
+                      color: 'white',
+                      fontSize: '0.875rem',
+                      '& fieldset': {
+                        borderColor: alpha('#fff', 0.3),
+                      },
+                      '&:hover fieldset': {
+                        borderColor: alpha('#fff', 0.5),
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: alpha('#fff', 0.7),
+                      },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: alpha('#fff', 0.7),
+                      fontSize: '0.875rem',
+                    },
+                    '& .MuiInputBase-input::placeholder': {
+                      color: alpha('#fff', 0.5),
+                      opacity: 1,
+                    },
+                  }}
+                />
+
+                {/* Search Button */}
+                <Tooltip title="Search absences for selected date range">
+                  <IconButton
+                    onClick={handleSearch}
+                    disabled={isSearching}
+                    sx={{
+                      backgroundColor: alpha('#fff', 0.15),
+                      color: 'white',
+                      height: 40,
+                      width: 40,
+                      '&:hover': {
+                        backgroundColor: alpha('#fff', 0.25),
+                      },
+                      '&:disabled': {
+                        backgroundColor: alpha('#fff', 0.05),
+                        color: alpha('#fff', 0.3),
+                      },
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    <SearchIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
               </Stack>
             </Stack>
           </Collapse>

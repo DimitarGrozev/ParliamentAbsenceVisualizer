@@ -34,10 +34,22 @@ export function PartyAbsenceCard({ party, rank, onClick }: PartyAbsenceCardProps
         height: '100%',
         cursor: onClick ? 'pointer' : 'default',
         position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
       }}
       onClick={onClick}
     >
-      <CardContent>
+      <CardContent
+        sx={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          pb: 2,
+          '&:last-child': {
+            pb: 2,
+          },
+        }}
+      >
         {/* Rank Badge */}
         {rankBadge && (
           <Box
@@ -52,13 +64,16 @@ export function PartyAbsenceCard({ party, rank, onClick }: PartyAbsenceCardProps
           </Box>
         )}
 
-        {/* Party Name */}
+        {/* Party Name - Takes up available space */}
         <Typography variant="h6" component="h3" gutterBottom sx={{ pr: rank ? 6 : 0 }}>
           {party.A_ns_CL_value}
         </Typography>
 
-        {/* Absence Count */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
+        {/* Spacer to push content to bottom */}
+        <Box sx={{ flex: 1 }} />
+
+        {/* Absence Count - Sticks to bottom */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
           <Chip
             label={`${party.absenceCount} absences`}
             color="error"
@@ -71,8 +86,8 @@ export function PartyAbsenceCard({ party, rank, onClick }: PartyAbsenceCardProps
           />
         </Box>
 
-        {/* Additional Info */}
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 2 }}>
+        {/* Additional Info - Sticks to bottom */}
+        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
           Total members: {party.A_ns_C_active_count}
         </Typography>
       </CardContent>

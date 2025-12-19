@@ -67,8 +67,8 @@ public class CachedParliamentApiService : IParliamentApiService
 
     public async Task<List<Absence>> GetAbsencesAsync(AbsenceRequest request)
     {
-        return await _innerService.GetAbsencesAsync(request);
         var cacheKey = GenerateAbsenceCacheKey(request);
+
         return await GetOrCreateAsync(
             cacheKey,
             () => _innerService.GetAbsencesAsync(request),
