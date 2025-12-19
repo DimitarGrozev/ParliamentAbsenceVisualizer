@@ -209,7 +209,9 @@ export function DynamicIslandNavbar({
                     ? new Date(dateRange.date1).toLocaleDateString('bg-BG', { month: 'short', day: 'numeric' })
                     : 'From'}
                     {' - '}
-                  {new Date(dateRange.date2).toLocaleDateString('bg-BG', { month: 'short', day: 'numeric' })}
+                  {dateRange.date2
+                    ? new Date(dateRange.date2).toLocaleDateString('bg-BG', { month: 'short', day: 'numeric' })
+                    : 'To'}
                 </Box>
               </Box>
             )}
@@ -276,11 +278,15 @@ export function DynamicIslandNavbar({
                       error: false,
                       sx: {
                         flex: 1,
-                        minWidth: 0,
+                        minWidth: { xs: 48, sm: 0 },
+                        maxWidth: { xs: 48, sm: 'none' },
                         '& .MuiOutlinedInput-root': {
                           backgroundColor: alpha('#fff', 0.1),
                           color: 'white',
                           fontSize: '0.875rem',
+                          justifyContent: { xs: 'center', sm: 'flex-start' },
+                          paddingLeft: { xs: 0, sm: '14px' },
+                          paddingRight: { xs: 0, sm: '14px' },
                           '& fieldset': {
                             borderColor: alpha('#fff', 0.3),
                           },
@@ -290,10 +296,19 @@ export function DynamicIslandNavbar({
                           '&.Mui-focused fieldset': {
                             borderColor: alpha('#fff', 0.7),
                           },
+                          '& input': {
+                            display: { xs: 'none', sm: 'block' },
+                            paddingLeft: { xs: 0, sm: 0 },
+                          },
                         },
                         '& .MuiInputLabel-root': {
                           color: alpha('#fff', 0.7),
                           fontSize: '0.875rem',
+                          display: { xs: 'none', sm: 'block' },
+                        },
+                        '& .MuiInputAdornment-root': {
+                          marginLeft: { xs: 0, sm: 'auto' },
+                          marginRight: { xs: 0, sm: 0 },
                         },
                         '& .MuiSvgIcon-root': {
                           color: alpha('#fff', 0.7),
@@ -319,11 +334,15 @@ export function DynamicIslandNavbar({
                       error: false,
                       sx: {
                         flex: 1,
-                        minWidth: 0,
+                        minWidth: { xs: 48, sm: 0 },
+                        maxWidth: { xs: 48, sm: 'none' },
                         '& .MuiOutlinedInput-root': {
                           backgroundColor: alpha('#fff', 0.1),
                           color: 'white',
                           fontSize: '0.875rem',
+                          justifyContent: { xs: 'center', sm: 'flex-start' },
+                          paddingLeft: { xs: 0, sm: '14px' },
+                          paddingRight: { xs: 0, sm: '14px' },
                           '& fieldset': {
                             borderColor: alpha('#fff', 0.3),
                           },
@@ -333,10 +352,19 @@ export function DynamicIslandNavbar({
                           '&.Mui-focused fieldset': {
                             borderColor: alpha('#fff', 0.7),
                           },
+                          '& input': {
+                            display: { xs: 'none', sm: 'block' },
+                            paddingLeft: { xs: 0, sm: 0 },
+                          },
                         },
                         '& .MuiInputLabel-root': {
                           color: alpha('#fff', 0.7),
                           fontSize: '0.875rem',
+                          display: { xs: 'none', sm: 'block' },
+                        },
+                        '& .MuiInputAdornment-root': {
+                          marginLeft: { xs: 0, sm: 'auto' },
+                          marginRight: { xs: 0, sm: 0 },
                         },
                         '& .MuiSvgIcon-root': {
                           color: alpha('#fff', 0.7),
