@@ -58,7 +58,7 @@ function Dashboard() {
   }
 
   return (
-    <>
+    <Box sx={{ pt: 14 }}>
       {/* Dynamic Island Navbar */}
       <DynamicIslandNavbar
         dateRange={dateRange}
@@ -81,7 +81,7 @@ function Dashboard() {
           error={absencesError}
         />
       </Box>
-    </>
+    </Box>
   );
 }
 

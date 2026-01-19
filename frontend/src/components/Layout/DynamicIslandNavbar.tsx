@@ -5,6 +5,7 @@ import {
   Stack,
   Chip,
   useTheme,
+  useMediaQuery,
   alpha,
   IconButton,
   Tooltip,
@@ -24,7 +25,6 @@ import {
   getThisWeek,
   getThisMonth,
   getAssemblyRange,
-  getCustomRange,
 } from '../../utils/datePresets';
 
 interface DynamicIslandNavbarProps {
@@ -42,20 +42,15 @@ export function DynamicIslandNavbar({
   onDateRangeChange,
 }: DynamicIslandNavbarProps) {
   const theme = useTheme();
-  const { refetchAbsences, memberNameFilter, setMemberNameFilter } = useAppContext();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { refetchAbsences, memberNameFilter, setMemberNameFilter, dateRange: contextDateRange, setDateRange: setContextDateRange } = useAppContext();
   const [isExpanded, setIsExpanded] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
-  const [startDate, setStartDate] = useState<Date | null>(dateRange.date1 ? new Date(dateRange.date1) : null);
-  const [endDate, setEndDate] = useState<Date | null>(dateRange.date2 ? new Date(dateRange.date2) : null);
-  const [activePreset, setActivePreset] = useState<string>('assembly');
+  const [startDate, setStartDate] = useState<Date | null>(contextDateRange.date1 ? new Date(contextDateRange.date1) : null);
+  const [endDate, setEndDate] = useState<Date | null>(contextDateRange.date2 ? new Date(contextDateRange.date2) : null);
+  const [activePreset, setActivePreset] = useState<string>(contextDateRange.date1 || contextDateRange.date2 ? '' : 'assembly');
   const [isSearching, setIsSearching] = useState(false);
   const searchButtonRef = useRef<HTMLButtonElement | null>(null);
-
-  // Sync internal state when dateRange prop changes
-  useEffect(() => {
-    setStartDate(dateRange.date1 ? new Date(dateRange.date1) : null);
-    setEndDate(dateRange.date2 ? new Date(dateRange.date2) : null);
-  }, [dateRange]);
 
   // Handle scroll to expand/contract navbar
   useEffect(() => {
@@ -107,6 +102,7 @@ export function DynamicIslandNavbar({
     try {
       await refetchAbsences(newRange.date1, newRange.date2, memberNameFilter);
       onDateRangeChange(newRange);
+      setContextDateRange(newRange);
     } catch (error) {
       console.error('Error fetching absences for preset:', error);
     } finally {
@@ -116,38 +112,32 @@ export function DynamicIslandNavbar({
 
   const handleStartDateChange = (date: Date | null) => {
     setStartDate(date);
-    if (date && endDate) {
-      onDateRangeChange(getCustomRange(date, endDate));
-      setActivePreset('');
-    } else if (!date && endDate) {
-      // If clearing start date, use assembly range (no start, only end)
-      onDateRangeChange({ date1: '', date2: endDate.toISOString().split('T')[0] });
-      setActivePreset('');
-    }
+    setActivePreset('');
   };
 
   const handleEndDateChange = (date: Date | null) => {
     setEndDate(date);
-    if (date && startDate) {
-      onDateRangeChange(getCustomRange(startDate, date));
-      setActivePreset('');
-    } else if (date && !startDate) {
-      // If no start date, use assembly range (no start, only end)
-      onDateRangeChange({ date1: '', date2: date.toISOString().split('T')[0] });
-      setActivePreset('');
-    }
+    setActivePreset('');
+  };
+
+  const formatDateToYYYYMMDD = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
   const handleSearch = async () => {
     setIsSearching(true);
     try {
-      const date1 = startDate ? startDate.toISOString().split('T')[0] : '';
-      const date2 = endDate ? endDate.toISOString().split('T')[0] : '';
+      const date1 = startDate ? formatDateToYYYYMMDD(startDate) : '';
+      const date2 = endDate ? formatDateToYYYYMMDD(endDate) : '';
 
       await refetchAbsences(date1, date2, memberNameFilter);
 
-      // Update the date range in parent component
+      // Update the date range in parent component and context
       onDateRangeChange({ date1, date2 });
+      setContextDateRange({ date1, date2 });
     } catch (error) {
       console.error('Error searching absences:', error);
     } finally {
@@ -236,7 +226,7 @@ export function DynamicIslandNavbar({
               }}
             >
               {/* Date Range Presets */}
-              <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
+              <Stack direction="row" spacing={0.5} flexWrap="wrap" justifyContent="center" useFlexGap>
                 {[
                   { key: 'today', label: 'Today' },
                   { key: 'week', label: 'Week' },
@@ -266,29 +256,24 @@ export function DynamicIslandNavbar({
                 ))}
               </Stack>
 
-              {/* Date Pickers - Compact */}
-              <Stack direction="row" spacing={1} sx={{ flex: 1, minWidth: 0, alignItems: 'flex-start' }}>
+              {/* Date Pickers */}
+              <Stack direction="row" spacing={isMobile ? 0.5 : 1} sx={{ flex: 1, minWidth: 0, alignItems: 'center' }}>
                 <DatePicker
-                  label="From"
+                  label='From'
                   value={startDate}
                   onChange={handleStartDateChange}
-                  format="dd/MM/yyyy"
                   slotProps={{
                     textField: {
                       size: 'small',
-                      placeholder: 'DD/MM/YYYY',
                       error: false,
                       sx: {
                         flex: 1,
-                        minWidth: { xs: 48, sm: 0 },
-                        maxWidth: { xs: 48, sm: 'none' },
+                        minWidth: { xs: 20, sm: 130 },
                         '& .MuiOutlinedInput-root': {
                           backgroundColor: alpha('#fff', 0.1),
                           color: 'white',
-                          fontSize: '0.875rem',
-                          justifyContent: { xs: 'center', sm: 'flex-start' },
-                          paddingLeft: { xs: 0, sm: '14px' },
-                          paddingRight: { xs: 0, sm: '14px' },
+                          fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                          height: 40,
                           '& fieldset': {
                             borderColor: alpha('#fff', 0.3),
                           },
@@ -298,24 +283,17 @@ export function DynamicIslandNavbar({
                           '&.Mui-focused fieldset': {
                             borderColor: alpha('#fff', 0.7),
                           },
-                          '& input': {
-                            display: { xs: 'none', sm: 'block' },
-                            paddingLeft: { xs: 0, sm: 0 },
-                          },
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: alpha('#fff', 0.7),
-                          fontSize: '0.875rem',
-                          display: { xs: 'none', sm: 'block' },
-                        },
-                        '& .MuiInputAdornment-root': {
-                          marginLeft: { xs: 0, sm: 'auto' },
-                          marginRight: { xs: 0, sm: 0 },
                         },
                         '& .MuiSvgIcon-root': {
                           color: alpha('#fff', 0.7),
-                          fontSize: '1.25rem',
+                          fontSize: { xs: '1rem', sm: '1.25rem' },
                         },
+                        '& .MuiInputBase-input': {
+                          padding: { xs: '4px 0 4px 8px', sm: '8.5px 14px' },
+                        },
+                        '& .MuiInputBase-input::placeholder': {
+                          color: 'transparent',
+                        }
                       },
                     },
                     field: {
@@ -325,26 +303,21 @@ export function DynamicIslandNavbar({
                   }}
                 />
                 <DatePicker
-                  label="To"
+                  label='To'
                   value={endDate}
                   onChange={handleEndDateChange}
-                  format="dd/MM/yyyy"
                   slotProps={{
                     textField: {
                       size: 'small',
-                      placeholder: 'DD/MM/YYYY',
                       error: false,
                       sx: {
                         flex: 1,
-                        minWidth: { xs: 48, sm: 0 },
-                        maxWidth: { xs: 48, sm: 'none' },
+                        minWidth: { xs: 20, sm: 130 },
                         '& .MuiOutlinedInput-root': {
                           backgroundColor: alpha('#fff', 0.1),
                           color: 'white',
-                          fontSize: '0.875rem',
-                          justifyContent: { xs: 'center', sm: 'flex-start' },
-                          paddingLeft: { xs: 0, sm: '14px' },
-                          paddingRight: { xs: 0, sm: '14px' },
+                          fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                          height: 40,
                           '& fieldset': {
                             borderColor: alpha('#fff', 0.3),
                           },
@@ -354,24 +327,17 @@ export function DynamicIslandNavbar({
                           '&.Mui-focused fieldset': {
                             borderColor: alpha('#fff', 0.7),
                           },
-                          '& input': {
-                            display: { xs: 'none', sm: 'block' },
-                            paddingLeft: { xs: 0, sm: 0 },
-                          },
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: alpha('#fff', 0.7),
-                          fontSize: '0.875rem',
-                          display: { xs: 'none', sm: 'block' },
-                        },
-                        '& .MuiInputAdornment-root': {
-                          marginLeft: { xs: 0, sm: 'auto' },
-                          marginRight: { xs: 0, sm: 0 },
                         },
                         '& .MuiSvgIcon-root': {
                           color: alpha('#fff', 0.7),
-                          fontSize: '1.25rem',
+                          fontSize: { xs: '1rem', sm: '1.25rem' },
                         },
+                        '& .MuiInputBase-input': {
+                          padding: { xs: '4px 0 4px 8px', sm: '8.5px 14px' },
+                        },
+                        '& .MuiInputBase-input::placeholder': {
+                          color: 'transparent',
+                        }
                       },
                     },
                     field: {
@@ -383,18 +349,18 @@ export function DynamicIslandNavbar({
 
                 {/* Member Name Search */}
                 <TextField
-                  label="Member Name"
+                  label= 'Member Name'
                   value={memberNameFilter}
                   onChange={(e) => setMemberNameFilter(e.target.value)}
-                  placeholder="Search by name..."
                   size="small"
                   sx={{
-                    minWidth: 160,
-                    maxWidth: 180,
+                    minWidth: { xs: 100, sm: 160 },
+                    maxWidth: { xs: 160, sm: 180 },
                     '& .MuiOutlinedInput-root': {
                       backgroundColor: alpha('#fff', 0.1),
                       color: 'white',
-                      fontSize: '0.875rem',
+                      fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                      height: 40,
                       '& fieldset': {
                         borderColor: alpha('#fff', 0.3),
                       },
@@ -408,6 +374,9 @@ export function DynamicIslandNavbar({
                     '& .MuiInputLabel-root': {
                       color: alpha('#fff', 0.7),
                       fontSize: '0.875rem',
+                    },
+                    '& .MuiInputBase-input': {
+                      padding: { xs: '4px 8px', sm: '8.5px 14px' },
                     },
                     '& .MuiInputBase-input::placeholder': {
                       color: alpha('#fff', 0.5),
@@ -427,6 +396,7 @@ export function DynamicIslandNavbar({
                       color: 'white',
                       height: 40,
                       width: 40,
+                      minWidth: 40,
                       '&:hover': {
                         backgroundColor: alpha('#fff', 0.25),
                       },
@@ -437,7 +407,7 @@ export function DynamicIslandNavbar({
                       transition: 'all 0.2s ease',
                     }}
                   >
-                    <SearchIcon fontSize="small" />
+                    <SearchIcon sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }} />
                   </IconButton>
                 </Tooltip>
               </Stack>

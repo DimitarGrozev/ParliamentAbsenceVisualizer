@@ -7,6 +7,11 @@ import { fetchAssembly, fetchMembers, fetchAbsences } from '../services/api';
 import { enrichAbsences } from '../utils/aggregations';
 import { preloadImages } from '../utils/imagePreloader';
 
+interface DateRange {
+  date1: string;
+  date2: string;
+}
+
 interface AppContextType {
   assembly: Assembly | null;
   parties: Party[];
@@ -14,10 +19,12 @@ interface AppContextType {
   allAbsences: EnrichedAbsence[];
   earliestAbsenceDate: string | null; // YYYY-MM-DD format of earliest loaded absence
   memberNameFilter: string; // Current member name filter
+  dateRange: DateRange; // Current date range filter
   loading: boolean;
   error: string | null;
   refetchAbsences: (startDate: string, endDate: string, memberName?: string) => Promise<void>;
   setMemberNameFilter: (name: string) => void;
+  setDateRange: (range: DateRange) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -38,6 +45,7 @@ export function AppProvider({ children }: AppProviderProps) {
   const [allAbsences, setAllAbsences] = useState<EnrichedAbsence[]>([]);
   const [earliestAbsenceDate, setEarliestAbsenceDate] = useState<string | null>(null);
   const [memberNameFilter, setMemberNameFilter] = useState<string>('');
+  const [dateRange, setDateRange] = useState<DateRange>({ date1: '', date2: '' });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -168,10 +176,12 @@ export function AppProvider({ children }: AppProviderProps) {
     allAbsences,
     earliestAbsenceDate,
     memberNameFilter,
+    dateRange,
     loading,
     error,
     refetchAbsences,
     setMemberNameFilter,
+    setDateRange,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

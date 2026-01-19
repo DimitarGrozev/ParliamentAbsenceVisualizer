@@ -37,9 +37,18 @@ export function AbsentMembersList({ absences, loading, error }: AbsentMembersLis
   }, [absences, nameFilter]);
 
   // Aggregate filtered absences by member (always aggregated)
+  // Sort by number of absences (descending), then by name (ascending)
   // Must be before early returns to satisfy Rules of Hooks
   const displayData = useMemo(() => {
-    return aggregateAbsencesByMember(filteredAbsences);
+    const aggregated = aggregateAbsencesByMember(filteredAbsences);
+    return aggregated.sort((a, b) => {
+      // First sort by absence count (descending)
+      if (b.absenceCount !== a.absenceCount) {
+        return b.absenceCount - a.absenceCount;
+      }
+      // Then sort by full name (ascending)
+      return a.fullName.localeCompare(b.fullName, 'bg');
+    });
   }, [filteredAbsences]);
 
   // Loading state

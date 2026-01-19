@@ -16,7 +16,6 @@ export function MainLayout({ children }: MainLayoutProps) {
       sx={{
         minHeight: '100vh',
         backgroundColor: 'background.default',
-        pt: 14, // Add top padding to account for fixed navbar
       }}
     >
       <Container maxWidth="xl" sx={{ py: 4 }}>
