@@ -20,11 +20,13 @@ interface AppContextType {
   earliestAbsenceDate: string | null; // YYYY-MM-DD format of earliest loaded absence
   memberNameFilter: string; // Current member name filter
   dateRange: DateRange; // Current date range filter
+  activePreset: string; // Current active preset
   loading: boolean;
   error: string | null;
   refetchAbsences: (startDate: string, endDate: string, memberName?: string) => Promise<void>;
   setMemberNameFilter: (name: string) => void;
   setDateRange: (range: DateRange) => void;
+  setActivePreset: (preset: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -46,6 +48,7 @@ export function AppProvider({ children }: AppProviderProps) {
   const [earliestAbsenceDate, setEarliestAbsenceDate] = useState<string | null>(null);
   const [memberNameFilter, setMemberNameFilter] = useState<string>('');
   const [dateRange, setDateRange] = useState<DateRange>({ date1: '', date2: '' });
+  const [activePreset, setActivePreset] = useState<string>('assembly');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -177,11 +180,13 @@ export function AppProvider({ children }: AppProviderProps) {
     earliestAbsenceDate,
     memberNameFilter,
     dateRange,
+    activePreset,
     loading,
     error,
     refetchAbsences,
     setMemberNameFilter,
     setDateRange,
+    setActivePreset,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

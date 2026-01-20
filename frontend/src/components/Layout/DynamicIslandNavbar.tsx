@@ -43,12 +43,11 @@ export function DynamicIslandNavbar({
 }: DynamicIslandNavbarProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const { refetchAbsences, memberNameFilter, setMemberNameFilter, dateRange: contextDateRange, setDateRange: setContextDateRange } = useAppContext();
+  const { refetchAbsences, memberNameFilter, setMemberNameFilter, dateRange: contextDateRange, setDateRange: setContextDateRange, activePreset, setActivePreset } = useAppContext();
   const [isExpanded, setIsExpanded] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [startDate, setStartDate] = useState<Date | null>(contextDateRange.date1 ? new Date(contextDateRange.date1) : null);
   const [endDate, setEndDate] = useState<Date | null>(contextDateRange.date2 ? new Date(contextDateRange.date2) : null);
-  const [activePreset, setActivePreset] = useState<string>(contextDateRange.date1 || contextDateRange.date2 ? '' : 'assembly');
   const [isSearching, setIsSearching] = useState(false);
   const searchButtonRef = useRef<HTMLButtonElement | null>(null);
 
@@ -246,9 +245,10 @@ export function DynamicIslandNavbar({
                       fontWeight: activePreset === preset.key ? 600 : 500,
                       fontSize: '0.75rem',
                       height: 28,
-                      border: `1px solid ${activePreset === preset.key ? alpha('#fff', 0.5) : 'transparent'}`,
+                      border: `1px solid ${activePreset === preset.key ? alpha('#fff', 0.5) : alpha('#fff', 0.2)}`,
                       '&:hover': {
                         backgroundColor: alpha('#fff', 0.25),
+                        borderColor: alpha('#fff', 0.4),
                       },
                       transition: 'all 0.2s ease',
                     }}
@@ -275,13 +275,20 @@ export function DynamicIslandNavbar({
                           fontSize: { xs: '0.75rem', sm: '0.875rem' },
                           height: 40,
                           '& fieldset': {
-                            borderColor: alpha('#fff', 0.3),
+                            borderColor: alpha('#fff', 0.2),
                           },
                           '&:hover fieldset': {
-                            borderColor: alpha('#fff', 0.5),
+                            borderColor: alpha('#fff', 0.4),
                           },
                           '&.Mui-focused fieldset': {
-                            borderColor: alpha('#fff', 0.7),
+                            borderColor: alpha('#fff', 0.5),
+                          },
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: alpha('#fff', 0.7),
+                          fontSize: '0.875rem',
+                          '&.Mui-focused': {
+                            color: alpha('#fff', 0.7),
                           },
                         },
                         '& .MuiSvgIcon-root': {
@@ -293,7 +300,7 @@ export function DynamicIslandNavbar({
                         },
                         '& .MuiInputBase-input::placeholder': {
                           color: 'transparent',
-                        }
+                        },
                       },
                     },
                     field: {
@@ -319,13 +326,20 @@ export function DynamicIslandNavbar({
                           fontSize: { xs: '0.75rem', sm: '0.875rem' },
                           height: 40,
                           '& fieldset': {
-                            borderColor: alpha('#fff', 0.3),
+                            borderColor: alpha('#fff', 0.2),
                           },
                           '&:hover fieldset': {
-                            borderColor: alpha('#fff', 0.5),
+                            borderColor: alpha('#fff', 0.4),
                           },
                           '&.Mui-focused fieldset': {
-                            borderColor: alpha('#fff', 0.7),
+                            borderColor: alpha('#fff', 0.5),
+                          },
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: alpha('#fff', 0.7),
+                          fontSize: '0.875rem',
+                          '&.Mui-focused': {
+                            color: alpha('#fff', 0.7),
                           },
                         },
                         '& .MuiSvgIcon-root': {
@@ -337,7 +351,7 @@ export function DynamicIslandNavbar({
                         },
                         '& .MuiInputBase-input::placeholder': {
                           color: 'transparent',
-                        }
+                        },
                       },
                     },
                     field: {
@@ -355,25 +369,28 @@ export function DynamicIslandNavbar({
                   size="small"
                   sx={{
                     minWidth: { xs: 100, sm: 160 },
-                    maxWidth: { xs: 160, sm: 180 },
+                    maxWidth: { xs: 130, sm: 180 },
                     '& .MuiOutlinedInput-root': {
                       backgroundColor: alpha('#fff', 0.1),
                       color: 'white',
                       fontSize: { xs: '0.75rem', sm: '0.875rem' },
                       height: 40,
                       '& fieldset': {
-                        borderColor: alpha('#fff', 0.3),
+                        borderColor: alpha('#fff', 0.2),
                       },
                       '&:hover fieldset': {
-                        borderColor: alpha('#fff', 0.5),
+                        borderColor: alpha('#fff', 0.4),
                       },
                       '&.Mui-focused fieldset': {
-                        borderColor: alpha('#fff', 0.7),
+                        borderColor: alpha('#fff', 0.5),
                       },
                     },
                     '& .MuiInputLabel-root': {
                       color: alpha('#fff', 0.7),
                       fontSize: '0.875rem',
+                      '&.Mui-focused': {
+                        color: alpha('#fff', 0.7),
+                      },
                     },
                     '& .MuiInputBase-input': {
                       padding: { xs: '4px 8px', sm: '8.5px 14px' },
