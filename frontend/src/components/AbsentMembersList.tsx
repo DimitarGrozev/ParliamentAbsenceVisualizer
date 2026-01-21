@@ -1,4 +1,4 @@
-import { Box, Typography, CircularProgress, Alert, TextField } from '@mui/material';
+import { Box, Typography, CircularProgress, Alert, TextField, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AbsentMemberCard } from './AbsentMemberCard';
@@ -22,19 +22,39 @@ interface AbsentMembersListProps {
 export function AbsentMembersList({ absences, loading, error }: AbsentMembersListProps) {
   const navigate = useNavigate();
   const [nameFilter, setNameFilter] = useState('');
+  const [partyFilter, setPartyFilter] = useState('');
 
-  // Filter absences by name (case-insensitive)
+  // Extract unique party names from absences
+  const availableParties = useMemo(() => {
+    const partyNames = new Set<string>();
+    absences.forEach(absence => {
+      if (absence.partyName) {
+        partyNames.add(absence.partyName);
+      }
+    });
+    return Array.from(partyNames).sort((a, b) => a.localeCompare(b, 'bg'));
+  }, [absences]);
+
+  // Filter absences by name and party (case-insensitive)
   // Must be before early returns to satisfy Rules of Hooks
   const filteredAbsences = useMemo(() => {
-    if (!nameFilter.trim()) {
-      return absences;
+    let filtered = absences;
+
+    // Filter by party
+    if (partyFilter) {
+      filtered = filtered.filter(absence => absence.partyName === partyFilter);
     }
 
-    const filterLower = nameFilter.toLowerCase();
-    return absences.filter(absence =>
-      absence.fullName.toLowerCase().includes(filterLower)
-    );
-  }, [absences, nameFilter]);
+    // Filter by name
+    if (nameFilter.trim()) {
+      const filterLower = nameFilter.toLowerCase();
+      filtered = filtered.filter(absence =>
+        absence.fullName.toLowerCase().includes(filterLower)
+      );
+    }
+
+    return filtered;
+  }, [absences, nameFilter, partyFilter]);
 
   // Aggregate filtered absences by member (always aggregated)
   // Sort by number of absences (descending), then by name (ascending)
@@ -103,15 +123,15 @@ export function AbsentMembersList({ absences, loading, error }: AbsentMembersLis
   // Display grid of aggregated member cards
   return (
     <Box>
-      {/* Controls: Search */}
-      <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+      {/* Controls: Search and Party Filter */}
+      <Box sx={{ mb: 3, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, alignItems: { xs: 'stretch', sm: 'center' } }}>
         {/* Search by name */}
         <TextField
           placeholder="Filter by name..."
           value={nameFilter}
           onChange={(e) => setNameFilter(e.target.value)}
           size="small"
-          sx={{ flexGrow: 1, minWidth: 200, maxWidth: 400 }}
+          sx={{ width: { xs: '100%', sm: 300 } }}
           slotProps={{
             input: {
               startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
@@ -119,8 +139,28 @@ export function AbsentMembersList({ absences, loading, error }: AbsentMembersLis
           }}
         />
 
+        {/* Filter by party */}
+        <FormControl size="small" sx={{ width: { xs: '100%', sm: 300 } }}>
+          <InputLabel id="party-filter-label">Filter by party...</InputLabel>
+          <Select
+            labelId="party-filter-label"
+            value={partyFilter}
+            label="Filter by party..."
+            onChange={(e) => setPartyFilter(e.target.value)}
+          >
+            <MenuItem value="">
+              <em>All Parties</em>
+            </MenuItem>
+            {availableParties.map((party) => (
+              <MenuItem key={party} value={party}>
+                {party}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
         {/* Results count */}
-        <Typography variant="body2" color="text.secondary" sx={{ ml: 'auto' }}>
+        <Typography variant="body2" color="text.secondary" sx={{ ml: { xs: 0, sm: 'auto' }, textAlign: { xs: 'right', sm: 'left' } }}>
           {displayData.length} member{displayData.length !== 1 ? 's' : ''}
         </Typography>
       </Box>

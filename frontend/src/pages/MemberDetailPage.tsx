@@ -347,7 +347,6 @@ export default function MemberDetailPage() {
                   <TableRow>
                     <TableCell sx={{ whiteSpace: 'nowrap' }}><strong>Date</strong></TableCell>
                     <TableCell sx={{ whiteSpace: 'nowrap' }}><strong>Location</strong></TableCell>
-                    <TableCell align="center" sx={{ whiteSpace: 'nowrap' }}><strong>Type</strong></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -357,13 +356,6 @@ export default function MemberDetailPage() {
                         {format(new Date(absence.MP_Ab_date), 'dd MMM yyyy', { locale: bg })}
                       </TableCell>
                       <TableCell>{absence.A_ns_CL_value}</TableCell>
-                      <TableCell align="center">
-                        <Chip
-                          label={absence.MP_Ab_T_id === 1 ? 'Type 1' : 'Type 2'}
-                          size="small"
-                          color={absence.MP_Ab_T_id === 1 ? 'error' : 'warning'}
-                        />
-                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
