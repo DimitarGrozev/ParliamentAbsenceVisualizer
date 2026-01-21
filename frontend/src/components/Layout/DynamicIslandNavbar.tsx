@@ -161,14 +161,11 @@ export function DynamicIslandNavbar({
       >
         <Box
           sx={{
-            background: `linear-gradient(135deg,
-              ${alpha(theme.palette.primary.dark, 0.95)} 0%,
-              ${alpha(theme.palette.primary.main, 0.92)} 50%,
-              ${alpha(theme.palette.secondary.main, 0.9)} 100%)`,
+            background: alpha('#e8f4fc', 0.75),
             backdropFilter: 'blur(20px)',
             borderRadius: isExpanded ? 6 : 50,
-            boxShadow: `0 8px 32px ${alpha(theme.palette.primary.main, 0.4)}`,
-            border: `1px solid ${alpha('#fff', 0.18)}`,
+            boxShadow: `0 4px 20px ${alpha('#000', 0.08)}`,
+            border: `1px solid ${alpha('#a0c4e8', 0.3)}`,
             padding: isExpanded ? { xs: 2, sm: 2.5 } : { xs: 1.5, sm: 2 },
             transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
             overflow: 'hidden',
@@ -187,15 +184,15 @@ export function DynamicIslandNavbar({
             <AccountBalanceIcon
               sx={{
                 fontSize: isExpanded ? 28 : 24,
-                color: 'white',
+                color: theme.palette.primary.main,
                 transition: 'all 0.3s ease',
               }}
             />
 
             {!isExpanded && (
               <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                <CalendarTodayIcon sx={{ fontSize: 18, color: alpha('#fff', 0.8) }} />
-                <Box sx={{ color: 'white', fontSize: 13, fontWeight: 500 }}>
+                <CalendarTodayIcon sx={{ fontSize: 18, color: alpha('#000', 0.6) }} />
+                <Box sx={{ color: alpha('#000', 0.8), fontSize: 13, fontWeight: 500 }}>
                   {dateRange.date1
                     ? new Date(dateRange.date1).toLocaleDateString('bg-BG', { month: 'short', day: 'numeric' })
                     : 'From'}
@@ -208,7 +205,7 @@ export function DynamicIslandNavbar({
             )}
 
             {isExpanded && (
-              <Box sx={{ color: 'white', fontSize: { xs: 16, sm: 18 }, fontWeight: 600, flex: 1 }}>
+              <Box sx={{ color: alpha('#000', 0.85), fontSize: { xs: 16, sm: 18 }, fontWeight: 600, flex: 1 }}>
                 Bulgarian Parliament Absence Tracker
               </Box>
             )}
@@ -239,16 +236,16 @@ export function DynamicIslandNavbar({
                     onClick={() => handlePresetClick(preset.key as any)}
                     sx={{
                       backgroundColor: activePreset === preset.key
-                        ? alpha('#fff', 0.3)
-                        : alpha('#fff', 0.1),
-                      color: 'white',
+                        ? alpha(theme.palette.primary.main, 0.15)
+                        : alpha('#000', 0.05),
+                      color: activePreset === preset.key ? theme.palette.primary.main : alpha('#000', 0.7),
                       fontWeight: activePreset === preset.key ? 600 : 500,
                       fontSize: '0.75rem',
                       height: 28,
-                      border: `1px solid ${activePreset === preset.key ? alpha('#fff', 0.5) : alpha('#fff', 0.2)}`,
+                      border: `1px solid ${activePreset === preset.key ? alpha(theme.palette.primary.main, 0.4) : alpha('#000', 0.12)}`,
                       '&:hover': {
-                        backgroundColor: alpha('#fff', 0.25),
-                        borderColor: alpha('#fff', 0.4),
+                        backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                        borderColor: alpha(theme.palette.primary.main, 0.3),
                       },
                       transition: 'all 0.2s ease',
                     }}
@@ -270,29 +267,29 @@ export function DynamicIslandNavbar({
                         flex: 1,
                         minWidth: { xs: 20, sm: 130 },
                         '& .MuiOutlinedInput-root': {
-                          backgroundColor: alpha('#fff', 0.1),
-                          color: 'white',
+                          backgroundColor: alpha('#e8f4fc', 0.7),
+                          color: alpha('#000', 0.85),
                           fontSize: { xs: '0.75rem', sm: '0.875rem' },
                           height: 40,
                           '& fieldset': {
-                            borderColor: alpha('#fff', 0.2),
+                            borderColor: alpha('#a0c4e8', 0.4),
                           },
                           '&:hover fieldset': {
-                            borderColor: alpha('#fff', 0.4),
+                            borderColor: alpha('#a0c4e8', 0.6),
                           },
                           '&.Mui-focused fieldset': {
-                            borderColor: alpha('#fff', 0.5),
+                            borderColor: theme.palette.primary.main,
                           },
                         },
                         '& .MuiInputLabel-root': {
-                          color: alpha('#fff', 0.7),
+                          color: alpha('#000', 0.6),
                           fontSize: '0.875rem',
                           '&.Mui-focused': {
-                            color: alpha('#fff', 0.7),
+                            color: theme.palette.primary.main,
                           },
                         },
                         '& .MuiSvgIcon-root': {
-                          color: alpha('#fff', 0.7),
+                          color: alpha('#000', 0.5),
                           fontSize: { xs: '1rem', sm: '1.25rem' },
                         },
                         '& .MuiInputBase-input': {
@@ -321,29 +318,29 @@ export function DynamicIslandNavbar({
                         flex: 1,
                         minWidth: { xs: 20, sm: 130 },
                         '& .MuiOutlinedInput-root': {
-                          backgroundColor: alpha('#fff', 0.1),
-                          color: 'white',
+                          backgroundColor: alpha('#e8f4fc', 0.7),
+                          color: alpha('#000', 0.85),
                           fontSize: { xs: '0.75rem', sm: '0.875rem' },
                           height: 40,
                           '& fieldset': {
-                            borderColor: alpha('#fff', 0.2),
+                            borderColor: alpha('#a0c4e8', 0.4),
                           },
                           '&:hover fieldset': {
-                            borderColor: alpha('#fff', 0.4),
+                            borderColor: alpha('#a0c4e8', 0.6),
                           },
                           '&.Mui-focused fieldset': {
-                            borderColor: alpha('#fff', 0.5),
+                            borderColor: theme.palette.primary.main,
                           },
                         },
                         '& .MuiInputLabel-root': {
-                          color: alpha('#fff', 0.7),
+                          color: alpha('#000', 0.6),
                           fontSize: '0.875rem',
                           '&.Mui-focused': {
-                            color: alpha('#fff', 0.7),
+                            color: theme.palette.primary.main,
                           },
                         },
                         '& .MuiSvgIcon-root': {
-                          color: alpha('#fff', 0.7),
+                          color: alpha('#000', 0.5),
                           fontSize: { xs: '1rem', sm: '1.25rem' },
                         },
                         '& .MuiInputBase-input': {
@@ -363,40 +360,43 @@ export function DynamicIslandNavbar({
 
                 {/* Member Name Search */}
                 <TextField
-                  label= 'Member Name'
+                  label='Member Name'
                   value={memberNameFilter}
                   onChange={(e) => setMemberNameFilter(e.target.value)}
                   size="small"
                   sx={{
                     minWidth: { xs: 100, sm: 160 },
                     maxWidth: { xs: 130, sm: 180 },
+                    '& .MuiInputBase-root.MuiOutlinedInput-root': {
+                      backgroundColor: 'transparent',
+                    },
                     '& .MuiOutlinedInput-root': {
-                      backgroundColor: alpha('#fff', 0.1),
-                      color: 'white',
+                      backgroundColor: alpha('#e8f4fc', 0.7),
+                      color: alpha('#000', 0.85),
                       fontSize: { xs: '0.75rem', sm: '0.875rem' },
                       height: 40,
                       '& fieldset': {
-                        borderColor: alpha('#fff', 0.2),
+                        // borderColor:alpha('#000', 0.5),
                       },
                       '&:hover fieldset': {
-                        borderColor: alpha('#fff', 0.4),
+                        borderColor: alpha('#000', 0.85),
                       },
                       '&.Mui-focused fieldset': {
-                        borderColor: alpha('#fff', 0.5),
+                        borderColor: theme.palette.primary.main,
                       },
                     },
                     '& .MuiInputLabel-root': {
-                      color: alpha('#fff', 0.7),
+                      color: alpha('#000', 0.6),
                       fontSize: '0.875rem',
                       '&.Mui-focused': {
-                        color: alpha('#fff', 0.7),
+                        color: theme.palette.primary.main,
                       },
                     },
                     '& .MuiInputBase-input': {
                       padding: { xs: '4px 8px', sm: '8.5px 14px' },
                     },
                     '& .MuiInputBase-input::placeholder': {
-                      color: alpha('#fff', 0.5),
+                      color: alpha('#000', 0.4),
                       opacity: 1,
                     },
                   }}
@@ -409,17 +409,18 @@ export function DynamicIslandNavbar({
                     onClick={handleSearch}
                     disabled={isSearching}
                     sx={{
-                      backgroundColor: alpha('#fff', 0.15),
-                      color: 'white',
+                      backgroundColor: alpha('#7eb5ec', 0.3),
+                      color: alpha('#000', 0.6),
                       height: 40,
                       width: 40,
                       minWidth: 40,
                       '&:hover': {
-                        backgroundColor: alpha('#fff', 0.25),
+                        backgroundColor: alpha('#5fa6ec', 0.5),
+                        color: alpha('#000', 0.8),
                       },
                       '&:disabled': {
-                        backgroundColor: alpha('#fff', 0.05),
-                        color: alpha('#fff', 0.3),
+                        backgroundColor: alpha('#a0c4e8', 0.15),
+                        color: alpha('#000', 0.3),
                       },
                       transition: 'all 0.2s ease',
                     }}

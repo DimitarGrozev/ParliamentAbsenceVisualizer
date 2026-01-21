@@ -322,7 +322,14 @@ export default function MemberDetailPage() {
       <Card>
         <CardContent>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs value={tabValue} onChange={handleTabChange} aria-label="member data tabs">
+            <Tabs
+              value={tabValue}
+              onChange={handleTabChange}
+              aria-label="member data tabs"
+              variant="scrollable"
+              scrollButtons="auto"
+              allowScrollButtonsMobile
+            >
               <Tab label={`Absences (${sortedAbsences.length})`} />
               <Tab label={`Municipalities (${profile?.munList.length || 0})`} />
               <Tab label={`Memberships (${profile?.mshipList.length || 0})`} />
@@ -334,13 +341,13 @@ export default function MemberDetailPage() {
 
           {/* Tab 0: Absence History */}
           <TabPanel value={tabValue} index={0}>
-            <TableContainer component={Paper} variant="outlined">
-              <Table>
+            <TableContainer component={Paper} variant="outlined" sx={{ overflowX: 'auto' }}>
+              <Table sx={{ minWidth: 400 }}>
                 <TableHead>
                   <TableRow>
-                    <TableCell><strong>Date</strong></TableCell>
-                    <TableCell><strong>Location</strong></TableCell>
-                    <TableCell align="center"><strong>Type</strong></TableCell>
+                    <TableCell sx={{ whiteSpace: 'nowrap' }}><strong>Date</strong></TableCell>
+                    <TableCell sx={{ whiteSpace: 'nowrap' }}><strong>Location</strong></TableCell>
+                    <TableCell align="center" sx={{ whiteSpace: 'nowrap' }}><strong>Type</strong></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -367,12 +374,12 @@ export default function MemberDetailPage() {
           {/* Tab 1: Municipalities */}
           <TabPanel value={tabValue} index={1}>
             {profile && profile.munList.length > 0 ? (
-              <TableContainer component={Paper} variant="outlined">
-                <Table>
+              <TableContainer component={Paper} variant="outlined" sx={{ overflowX: 'auto' }}>
+                <Table sx={{ minWidth: 350 }}>
                   <TableHead>
                     <TableRow>
-                      <TableCell><strong>Municipality ID</strong></TableCell>
-                      <TableCell><strong>Municipality Name</strong></TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}><strong>Municipality ID</strong></TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}><strong>Municipality Name</strong></TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -393,14 +400,14 @@ export default function MemberDetailPage() {
           {/* Tab 2: Memberships */}
           <TabPanel value={tabValue} index={2}>
             {profile && profile.mshipList.length > 0 ? (
-              <TableContainer component={Paper} variant="outlined">
-                <Table>
+              <TableContainer component={Paper} variant="outlined" sx={{ overflowX: 'auto' }}>
+                <Table sx={{ minWidth: 600 }}>
                   <TableHead>
                     <TableRow>
-                      <TableCell><strong>Organization</strong></TableCell>
-                      <TableCell><strong>Position</strong></TableCell>
-                      <TableCell><strong>From</strong></TableCell>
-                      <TableCell><strong>To</strong></TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}><strong>Organization</strong></TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}><strong>Position</strong></TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}><strong>From</strong></TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}><strong>To</strong></TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -429,14 +436,14 @@ export default function MemberDetailPage() {
           {/* Tab 3: Proposed Laws */}
           <TabPanel value={tabValue} index={3}>
             {profile && profile.importActList.length > 0 ? (
-              <TableContainer component={Paper} variant="outlined">
-                <Table>
+              <TableContainer component={Paper} variant="outlined" sx={{ overflowX: 'auto' }}>
+                <Table sx={{ minWidth: 650 }}>
                   <TableHead>
                     <TableRow>
-                      <TableCell><strong>Sign</strong></TableCell>
-                      <TableCell><strong>Title</strong></TableCell>
-                      <TableCell><strong>Date</strong></TableCell>
-                      <TableCell><strong>Proposal Period</strong></TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}><strong>Sign</strong></TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}><strong>Title</strong></TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}><strong>Date</strong></TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}><strong>Proposal Period</strong></TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -464,14 +471,14 @@ export default function MemberDetailPage() {
           {/* Tab 4: Questions to Ministers */}
           <TabPanel value={tabValue} index={4}>
             {profile && profile.controlList.length > 0 ? (
-              <TableContainer component={Paper} variant="outlined">
-                <Table>
+              <TableContainer component={Paper} variant="outlined" sx={{ overflowX: 'auto' }}>
+                <Table sx={{ minWidth: 700 }}>
                   <TableHead>
                     <TableRow>
-                      <TableCell><strong>Date</strong></TableCell>
-                      <TableCell><strong>To</strong></TableCell>
-                      <TableCell><strong>Subject</strong></TableCell>
-                      <TableCell><strong>Type</strong></TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}><strong>Date</strong></TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}><strong>To</strong></TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}><strong>Subject</strong></TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}><strong>Type</strong></TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -500,13 +507,13 @@ export default function MemberDetailPage() {
           {/* Tab 5: Legislative Amendments */}
           <TabPanel value={tabValue} index={5}>
             {profile && profile.legImportList.length > 0 ? (
-              <TableContainer component={Paper} variant="outlined">
-                <Table>
+              <TableContainer component={Paper} variant="outlined" sx={{ overflowX: 'auto' }}>
+                <Table sx={{ minWidth: 550 }}>
                   <TableHead>
                     <TableRow>
-                      <TableCell><strong>Document Number</strong></TableCell>
-                      <TableCell><strong>Date</strong></TableCell>
-                      <TableCell><strong>Description</strong></TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}><strong>Document Number</strong></TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}><strong>Date</strong></TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}><strong>Description</strong></TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>

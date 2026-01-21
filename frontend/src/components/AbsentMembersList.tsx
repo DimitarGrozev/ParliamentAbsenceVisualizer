@@ -107,7 +107,7 @@ export function AbsentMembersList({ absences, loading, error }: AbsentMembersLis
       <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
         {/* Search by name */}
         <TextField
-          placeholder="Search by name..."
+          placeholder="Filter by name..."
           value={nameFilter}
           onChange={(e) => setNameFilter(e.target.value)}
           size="small"
