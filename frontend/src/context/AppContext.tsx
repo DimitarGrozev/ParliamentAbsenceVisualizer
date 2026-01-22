@@ -21,12 +21,16 @@ interface AppContextType {
   memberNameFilter: string; // Current member name filter
   dateRange: DateRange; // Current date range filter
   activePreset: string; // Current active preset
+  topPartiesPanelExpanded: boolean; // Whether the top parties panel is expanded
+  dashboardScrollPosition: number; // Scroll position on dashboard to restore after navigation
   loading: boolean;
   error: string | null;
   refetchAbsences: (startDate: string, endDate: string, memberName?: string) => Promise<void>;
   setMemberNameFilter: (name: string) => void;
   setDateRange: (range: DateRange) => void;
   setActivePreset: (preset: string) => void;
+  setTopPartiesPanelExpanded: (expanded: boolean) => void;
+  setDashboardScrollPosition: (position: number) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -49,6 +53,8 @@ export function AppProvider({ children }: AppProviderProps) {
   const [memberNameFilter, setMemberNameFilter] = useState<string>('');
   const [dateRange, setDateRange] = useState<DateRange>({ date1: '', date2: '' });
   const [activePreset, setActivePreset] = useState<string>('assembly');
+  const [topPartiesPanelExpanded, setTopPartiesPanelExpanded] = useState(true);
+  const [dashboardScrollPosition, setDashboardScrollPosition] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -181,12 +187,16 @@ export function AppProvider({ children }: AppProviderProps) {
     memberNameFilter,
     dateRange,
     activePreset,
+    topPartiesPanelExpanded,
+    dashboardScrollPosition,
     loading,
     error,
     refetchAbsences,
     setMemberNameFilter,
     setDateRange,
     setActivePreset,
+    setTopPartiesPanelExpanded,
+    setDashboardScrollPosition,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

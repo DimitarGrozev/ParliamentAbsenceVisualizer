@@ -253,181 +253,187 @@ export function DynamicIslandNavbar({
                 ))}
               </Stack>
 
-              {/* Date Pickers */}
-              <Stack direction="row" spacing={isMobile ? 0.5 : 1} sx={{ flex: 1, minWidth: 0, alignItems: 'center' }}>
-                <DatePicker
-                  label='From'
-                  value={startDate}
-                  onChange={handleStartDateChange}
-                  slotProps={{
-                    textField: {
-                      size: 'small',
-                      error: false,
-                      sx: {
-                        flex: 1,
-                        minWidth: { xs: 20, sm: 130 },
-                        '& .MuiOutlinedInput-root': {
-                          backgroundColor: alpha('#e8f4fc', 0.7),
-                          color: alpha('#000', 0.85),
-                          fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                          height: 40,
-                          '& fieldset': {
-                            borderColor: alpha('#a0c4e8', 0.4),
+              {/* Date Pickers and Member Name - stacked on mobile */}
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ flex: 1, minWidth: 0 }}>
+                {/* Date Pickers Row */}
+                <Stack direction="row" spacing={isMobile ? 0.5 : 1} sx={{ flex: 1, minWidth: 0, alignItems: 'center' }}>
+                  <DatePicker
+                    label='From'
+                    value={startDate}
+                    onChange={handleStartDateChange}
+                    slotProps={{
+                      textField: {
+                        size: 'small',
+                        error: false,
+                        sx: {
+                          flex: 1,
+                          minWidth: { xs: 20, sm: 130 },
+                          '& .MuiOutlinedInput-root': {
+                            backgroundColor: alpha('#e8f4fc', 0.7),
+                            color: alpha('#000', 0.85),
+                            fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                            height: 40,
+                            '& fieldset': {
+                              borderColor: alpha('#a0c4e8', 0.4),
+                            },
+                            '&:hover fieldset': {
+                              borderColor: alpha('#a0c4e8', 0.6),
+                            },
+                            '&.Mui-focused fieldset': {
+                              borderColor: theme.palette.primary.main,
+                            },
                           },
-                          '&:hover fieldset': {
-                            borderColor: alpha('#a0c4e8', 0.6),
+                          '& .MuiInputLabel-root': {
+                            color: alpha('#000', 0.6),
+                            fontSize: '0.875rem',
+                            '&.Mui-focused': {
+                              color: theme.palette.primary.main,
+                            },
                           },
-                          '&.Mui-focused fieldset': {
-                            borderColor: theme.palette.primary.main,
+                          '& .MuiSvgIcon-root': {
+                            color: alpha('#000', 0.5),
+                            fontSize: { xs: '1rem', sm: '1.25rem' },
                           },
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: alpha('#000', 0.6),
-                          fontSize: '0.875rem',
-                          '&.Mui-focused': {
-                            color: theme.palette.primary.main,
+                          '& .MuiInputBase-input': {
+                            padding: { xs: '4px 0 4px 8px', sm: '8.5px 14px' },
                           },
-                        },
-                        '& .MuiSvgIcon-root': {
-                          color: alpha('#000', 0.5),
-                          fontSize: { xs: '1rem', sm: '1.25rem' },
-                        },
-                        '& .MuiInputBase-input': {
-                          padding: { xs: '4px 0 4px 8px', sm: '8.5px 14px' },
-                        },
-                        '& .MuiInputBase-input::placeholder': {
-                          color: 'transparent',
-                        },
-                      },
-                    },
-                    field: {
-                      clearable: true,
-                      onClear: () => handleStartDateChange(null),
-                    },
-                  }}
-                />
-                <DatePicker
-                  label='To'
-                  value={endDate}
-                  onChange={handleEndDateChange}
-                  slotProps={{
-                    textField: {
-                      size: 'small',
-                      error: false,
-                      sx: {
-                        flex: 1,
-                        minWidth: { xs: 20, sm: 130 },
-                        '& .MuiOutlinedInput-root': {
-                          backgroundColor: alpha('#e8f4fc', 0.7),
-                          color: alpha('#000', 0.85),
-                          fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                          height: 40,
-                          '& fieldset': {
-                            borderColor: alpha('#a0c4e8', 0.4),
-                          },
-                          '&:hover fieldset': {
-                            borderColor: alpha('#a0c4e8', 0.6),
-                          },
-                          '&.Mui-focused fieldset': {
-                            borderColor: theme.palette.primary.main,
+                          '& .MuiInputBase-input::placeholder': {
+                            color: 'transparent',
                           },
                         },
-                        '& .MuiInputLabel-root': {
-                          color: alpha('#000', 0.6),
-                          fontSize: '0.875rem',
-                          '&.Mui-focused': {
-                            color: theme.palette.primary.main,
-                          },
-                        },
-                        '& .MuiSvgIcon-root': {
-                          color: alpha('#000', 0.5),
-                          fontSize: { xs: '1rem', sm: '1.25rem' },
-                        },
-                        '& .MuiInputBase-input': {
-                          padding: { xs: '4px 0 4px 8px', sm: '8.5px 14px' },
-                        },
-                        '& .MuiInputBase-input::placeholder': {
-                          color: 'transparent',
-                        },
                       },
-                    },
-                    field: {
-                      clearable: true,
-                      onClear: () => handleEndDateChange(null),
-                    },
-                  }}
-                />
-
-                {/* Member Name Search */}
-                <TextField
-                  label='Member Name'
-                  value={memberNameFilter}
-                  onChange={(e) => setMemberNameFilter(e.target.value)}
-                  size="small"
-                  sx={{
-                    minWidth: { xs: 100, sm: 160 },
-                    maxWidth: { xs: 130, sm: 180 },
-                    '& .MuiInputBase-root.MuiOutlinedInput-root': {
-                      backgroundColor: 'transparent',
-                    },
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: alpha('#e8f4fc', 0.7),
-                      color: alpha('#000', 0.85),
-                      fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                      height: 40,
-                      '& fieldset': {
-                        // borderColor:alpha('#000', 0.5),
+                      field: {
+                        clearable: true,
+                        onClear: () => handleStartDateChange(null),
                       },
-                      '&:hover fieldset': {
-                        borderColor: alpha('#000', 0.85),
-                      },
-                      '&.Mui-focused fieldset': {
-                        borderColor: theme.palette.primary.main,
-                      },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: alpha('#000', 0.6),
-                      fontSize: '0.875rem',
-                      '&.Mui-focused': {
-                        color: theme.palette.primary.main,
-                      },
-                    },
-                    '& .MuiInputBase-input': {
-                      padding: { xs: '4px 8px', sm: '8.5px 14px' },
-                    },
-                    '& .MuiInputBase-input::placeholder': {
-                      color: alpha('#000', 0.4),
-                      opacity: 1,
-                    },
-                  }}
-                />
-
-                {/* Search Button */}
-                <Tooltip title="">
-                  <IconButton
-                    ref={searchButtonRef}
-                    onClick={handleSearch}
-                    disabled={isSearching}
-                    sx={{
-                      backgroundColor: alpha('#7eb5ec', 0.3),
-                      color: alpha('#000', 0.6),
-                      height: 40,
-                      width: 40,
-                      minWidth: 40,
-                      '&:hover': {
-                        backgroundColor: alpha('#5fa6ec', 0.5),
-                        color: alpha('#000', 0.8),
-                      },
-                      '&:disabled': {
-                        backgroundColor: alpha('#a0c4e8', 0.15),
-                        color: alpha('#000', 0.3),
-                      },
-                      transition: 'all 0.2s ease',
                     }}
-                  >
-                    <SearchIcon sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }} />
-                  </IconButton>
-                </Tooltip>
+                  />
+                  <DatePicker
+                    label='To'
+                    value={endDate}
+                    onChange={handleEndDateChange}
+                    slotProps={{
+                      textField: {
+                        size: 'small',
+                        error: false,
+                        sx: {
+                          flex: 1,
+                          minWidth: { xs: 20, sm: 130 },
+                          '& .MuiOutlinedInput-root': {
+                            backgroundColor: alpha('#e8f4fc', 0.7),
+                            color: alpha('#000', 0.85),
+                            fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                            height: 40,
+                            '& fieldset': {
+                              borderColor: alpha('#a0c4e8', 0.4),
+                            },
+                            '&:hover fieldset': {
+                              borderColor: alpha('#a0c4e8', 0.6),
+                            },
+                            '&.Mui-focused fieldset': {
+                              borderColor: theme.palette.primary.main,
+                            },
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: alpha('#000', 0.6),
+                            fontSize: '0.875rem',
+                            '&.Mui-focused': {
+                              color: theme.palette.primary.main,
+                            },
+                          },
+                          '& .MuiSvgIcon-root': {
+                            color: alpha('#000', 0.5),
+                            fontSize: { xs: '1rem', sm: '1.25rem' },
+                          },
+                          '& .MuiInputBase-input': {
+                            padding: { xs: '4px 0 4px 8px', sm: '8.5px 14px' },
+                          },
+                          '& .MuiInputBase-input::placeholder': {
+                            color: 'transparent',
+                          },
+                        },
+                      },
+                      field: {
+                        clearable: true,
+                        onClear: () => handleEndDateChange(null),
+                      },
+                    }}
+                  />
+                </Stack>
+
+                {/* Member Name Search + Search Button Row */}
+                <Stack direction="row" spacing={isMobile ? 0.5 : 1} sx={{ alignItems: 'center' }}>
+                  <TextField
+                    label='Member Name'
+                    value={memberNameFilter}
+                    onChange={(e) => setMemberNameFilter(e.target.value)}
+                    size="small"
+                    sx={{
+                      flex: 1,
+                      minWidth: { xs: 100, sm: 160 },
+                      maxWidth: { xs: '100%', sm: 180 },
+                      '& .MuiInputBase-root.MuiOutlinedInput-root': {
+                        backgroundColor: 'transparent',
+                      },
+                      '& .MuiOutlinedInput-root': {
+                        backgroundColor: alpha('#e8f4fc', 0.7),
+                        color: alpha('#000', 0.85),
+                        fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                        height: 40,
+                        // '& fieldset': {
+                        //   borderColor: alpha('#a0c4e8', 0.4),
+                        // },
+                        '&:hover fieldset': {
+                          borderColor: alpha('#000', 0.85),
+                        },
+                        '&.Mui-focused fieldset': {
+                          borderColor: theme.palette.primary.main,
+                        },
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: alpha('#000', 0.6),
+                        fontSize: '0.875rem',
+                        '&.Mui-focused': {
+                          color: theme.palette.primary.main,
+                        },
+                      },
+                      '& .MuiInputBase-input': {
+                        padding: { xs: '4px 8px', sm: '8.5px 14px' },
+                      },
+                      '& .MuiInputBase-input::placeholder': {
+                        color: alpha('#000', 0.4),
+                        opacity: 1,
+                      },
+                    }}
+                  />
+
+                  {/* Search Button */}
+                  <Tooltip title="">
+                    <IconButton
+                      ref={searchButtonRef}
+                      onClick={handleSearch}
+                      disabled={isSearching}
+                      sx={{
+                        backgroundColor: alpha('#7eb5ec', 0.3),
+                        color: alpha('#000', 0.6),
+                        height: 40,
+                        width: 40,
+                        minWidth: 40,
+                        '&:hover': {
+                          backgroundColor: alpha('#5fa6ec', 0.5),
+                          color: alpha('#000', 0.8),
+                        },
+                        '&:disabled': {
+                          backgroundColor: alpha('#a0c4e8', 0.15),
+                          color: alpha('#000', 0.3),
+                        },
+                        transition: 'all 0.2s ease',
+                      }}
+                    >
+                      <SearchIcon sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }} />
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
               </Stack>
             </Stack>
           </Collapse>

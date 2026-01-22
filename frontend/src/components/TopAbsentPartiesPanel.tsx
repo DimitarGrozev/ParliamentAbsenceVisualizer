@@ -1,8 +1,8 @@
-import { useState } from 'react';
 import { Box, Typography, IconButton, Collapse } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { PartyAbsenceCard } from './PartyAbsenceCard';
 import type { PartyWithAbsences } from '../types/party';
+import { useAppContext } from '../context/AppContext';
 
 interface TopAbsentPartiesPanelProps {
   parties: PartyWithAbsences[];
@@ -13,7 +13,7 @@ interface TopAbsentPartiesPanelProps {
  * Shows ranking with medal indicators
  */
 export function TopAbsentPartiesPanel({ parties }: TopAbsentPartiesPanelProps) {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const { topPartiesPanelExpanded, setTopPartiesPanelExpanded } = useAppContext();
 
   if (parties.length === 0) {
     return null;
@@ -26,18 +26,18 @@ export function TopAbsentPartiesPanel({ parties }: TopAbsentPartiesPanelProps) {
           Top Parties by Absences
         </Typography>
         <IconButton
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={() => setTopPartiesPanelExpanded(!topPartiesPanelExpanded)}
           sx={{
-            transform: isExpanded ? 'rotate(0deg)' : 'rotate(-90deg)',
+            transform: topPartiesPanelExpanded ? 'rotate(0deg)' : 'rotate(-90deg)',
             transition: 'transform 0.3s ease',
           }}
-          aria-label={isExpanded ? 'Collapse panel' : 'Expand panel'}
+          aria-label={topPartiesPanelExpanded ? 'Collapse panel' : 'Expand panel'}
         >
           <ExpandMoreIcon />
         </IconButton>
       </Box>
 
-      <Collapse in={isExpanded} timeout={300}>
+      <Collapse in={topPartiesPanelExpanded} timeout={300}>
         <Box
           sx={{
             display: 'grid',

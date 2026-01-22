@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Box, Typography, CircularProgress, Alert } from '@mui/material';
@@ -18,7 +18,7 @@ import MemberDetailPage from './pages/MemberDetailPage';
  * Displays dynamic island navbar, top absent parties, and absent members list
  */
 function Dashboard() {
-  const { members, loading: contextLoading, error: contextError } = useAppContext();
+  const { members, loading: contextLoading, error: contextError, dashboardScrollPosition, setDashboardScrollPosition } = useAppContext();
   const [dateRange, setDateRange] = useState<DateRange>({ date1: '', date2: '' });
   const { absences, loading: absencesLoading, error: absencesError } = useAbsences(dateRange);
 
@@ -27,6 +27,24 @@ function Dashboard() {
     () => getTopAbsentPartiesByName(absences, members, 3),
     [absences, members]
   );
+
+  // Restore scroll position when component mounts
+  useEffect(() => {
+    if (dashboardScrollPosition > 0) {
+      window.scrollTo(0, dashboardScrollPosition);
+    }
+  }, []);
+
+  // Save scroll position before navigating away
+  useEffect(() => {
+    const handleScroll = () => {
+      setDashboardScrollPosition(window.scrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [setDashboardScrollPosition]);
+
   // Show loading state while initial data loads
   if (contextLoading) {
     return (
@@ -66,7 +84,7 @@ function Dashboard() {
       />
 
       {/* Top Absent Parties */}
-      <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 0, sm: 2, md: 4 }, mt: 4 }}>
+      <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 0, sm: 2, md: 4 }, mt: { xs: 10, sm: 4 } }}>
         <TopAbsentPartiesPanel parties={topParties} />
       </Box>
 
