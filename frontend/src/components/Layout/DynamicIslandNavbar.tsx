@@ -161,8 +161,8 @@ export function DynamicIslandNavbar({
       >
         <Box
           sx={{
-            background: alpha('#e8f4fc', 0.75),
-            backdropFilter: 'blur(20px)',
+            background: alpha('#d9effd', 0.5),
+            backdropFilter: 'blur(15px)',
             borderRadius: isExpanded ? 6 : 50,
             boxShadow: `0 4px 20px ${alpha('#000', 0.08)}`,
             border: `1px solid ${alpha('#a0c4e8', 0.3)}`,
@@ -380,9 +380,6 @@ export function DynamicIslandNavbar({
                         color: alpha('#000', 0.85),
                         fontSize: { xs: '0.75rem', sm: '0.875rem' },
                         height: 40,
-                        // '& fieldset': {
-                        //   borderColor: alpha('#a0c4e8', 0.4),
-                        // },
                         '&:hover fieldset': {
                           borderColor: alpha('#000', 0.85),
                         },
