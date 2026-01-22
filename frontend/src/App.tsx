@@ -1,7 +1,8 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
-import { CssBaseline, Box, Typography, CircularProgress, Alert } from '@mui/material';
+import { CssBaseline, Box, Typography, CircularProgress, Alert, Fab, Zoom } from '@mui/material';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { MainLayout } from './components/Layout/MainLayout';
 import { DynamicIslandNavbar } from './components/Layout/DynamicIslandNavbar';
 import { TopAbsentPartiesPanel } from './components/TopAbsentPartiesPanel';
@@ -35,15 +36,22 @@ function Dashboard() {
     }
   }, []);
 
-  // Save scroll position before navigating away
+  // Track scroll position for save and show/hide scroll-to-top button
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
   useEffect(() => {
     const handleScroll = () => {
       setDashboardScrollPosition(window.scrollY);
+      setShowScrollTop(window.scrollY > 300);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [setDashboardScrollPosition]);
+
+  const handleScrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Show loading state while initial data loads
   if (contextLoading) {
@@ -76,30 +84,55 @@ function Dashboard() {
   }
 
   return (
-    <Box sx={{ pt: 14 }}>
-      {/* Dynamic Island Navbar */}
-      <DynamicIslandNavbar
-        dateRange={dateRange}
-        onDateRangeChange={setDateRange}
-      />
-
-      {/* Top Absent Parties */}
-      <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 0, sm: 2, md: 4 }, mt: { xs: 10, sm: 4 } }}>
-        <TopAbsentPartiesPanel parties={topParties} />
-      </Box>
-
-      {/* Absent Members Section */}
-      <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 0, sm: 2, md: 4 }, mb: 3 }}>
-        <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
-          Absent Members
-        </Typography>
-        <AbsentMembersList
-          absences={absences}
-          loading={absencesLoading}
-          error={absencesError}
+    <>
+      <Box sx={{ pt: 14 }}>
+        {/* Dynamic Island Navbar */}
+        <DynamicIslandNavbar
+          dateRange={dateRange}
+          onDateRangeChange={setDateRange}
         />
+
+        {/* Top Absent Parties */}
+        <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 0, sm: 2, md: 4 }, mt: { xs: 10, sm: 4 } }}>
+          <TopAbsentPartiesPanel parties={topParties} />
+        </Box>
+
+        {/* Absent Members Section */}
+        <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 0, sm: 2, md: 4 }, mb: 3 }}>
+          <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
+            Absent Members
+          </Typography>
+          <AbsentMembersList
+            absences={absences}
+            loading={absencesLoading}
+            error={absencesError}
+          />
+        </Box>
       </Box>
-    </Box>
+
+      {/* Scroll to Top Button */}
+      <Zoom in={showScrollTop}>
+        <Fab
+          size="medium"
+          onClick={handleScrollToTop}
+          sx={{
+            backgroundColor: 'rgba(217, 239, 253, 0.7)',
+            backdropFilter: 'blur(8px)',
+            position: 'fixed',
+            bottom: 24,
+            right: 24,
+            zIndex: 9999,
+            boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
+            '&:hover': {
+              backgroundColor: 'rgba(200, 230, 250, 0.8)',
+            },
+          }}
+          aria-label="scroll to top"
+        >
+          <KeyboardArrowUpIcon />
+        </Fab>
+      </Zoom>
+    </>
   );
 }
 
