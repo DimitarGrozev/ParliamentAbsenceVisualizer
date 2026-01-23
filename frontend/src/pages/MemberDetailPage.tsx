@@ -442,7 +442,16 @@ export default function MemberDetailPage() {
                     {profile.importActList.map((act) => (
                       <TableRow key={act.L_Act_id}>
                         <TableCell>{act.L_Act_sign}</TableCell>
-                        <TableCell>{act.L_ActL_title}</TableCell>
+                        <TableCell>
+                          <a
+                            href={`https://www.parliament.bg/bills/${act.L_Act_sign.substring(0, 2)}/${act.L_Act_sign}.pdf`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ color: 'inherit', textDecoration: 'underline' }}
+                          >
+                            {act.L_ActL_title}
+                          </a>
+                        </TableCell>
                         <TableCell>
                           {formatDateSafe(act.L_Act_date)}
                         </TableCell>
