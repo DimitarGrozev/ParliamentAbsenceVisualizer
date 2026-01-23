@@ -3,8 +3,10 @@ using ParliamentAbsenceVisualizer.Api.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.AspNetCore.RateLimiting;
 using System.IO.Compression;
 using System.Text.Json;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,6 +70,31 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Configure rate limiting with sliding window per IP
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+        RateLimitPartition.GetSlidingWindowLimiter(
+            partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new SlidingWindowRateLimiterOptions
+            {
+                PermitLimit = 60,
+                Window = TimeSpan.FromMinutes(1),
+                SegmentsPerWindow = 6,
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 2
+            }));
+
+    options.OnRejected = async (context, token) =>
+    {
+        context.HttpContext.Response.Headers.RetryAfter = "60";
+        await context.HttpContext.Response.WriteAsJsonAsync(
+            new { error = "Rate limit exceeded. Please wait before retrying." }, token);
+    };
+});
+
 // Register HttpClient and services with decorator pattern
 builder.Services.AddHttpClient<ParliamentApiService>();
 builder.Services.AddScoped<IParliamentApiService>(sp =>
@@ -89,6 +116,8 @@ builder.Services.AddScoped<IParliamentApiService>(sp =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
+app.UseRateLimiter();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
