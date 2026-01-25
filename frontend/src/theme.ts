@@ -72,6 +72,16 @@ export const theme = createTheme({
     borderRadius: 8,
   },
   components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        html: {
+          backgroundColor: '#f5f5f5',
+        },
+        body: {
+          backgroundColor: 'transparent',
+        },
+      },
+    },
     MuiCard: {
       styleOverrides: {
         root: {

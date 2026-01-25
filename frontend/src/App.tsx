@@ -143,6 +143,36 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      {/* Fixed background image of parliament building */}
+      <Box
+        sx={{
+          position: 'fixed',
+          bottom: 0,
+          left: '50%',
+          transform: {
+            xs: 'translateX(-25%) scale(2.5)',
+            sm: 'translateX(-30%) scale(1.8)',
+            md: 'translateX(-42%)',
+          },
+          transformOrigin: 'bottom center',
+          width: '100%',
+          maxWidth: 1600,
+          height: 'auto',
+          zIndex: 0,
+          pointerEvents: 'none',
+          opacity: 0.1,
+        }}
+      >
+        <img
+          src="/parliament-bg.png"
+          alt=""
+          style={{
+            width: '100%',
+            height: 'auto',
+            display: 'block',
+          }}
+        />
+      </Box>
       <AppProvider>
         <MainLayout>
           <Routes>
