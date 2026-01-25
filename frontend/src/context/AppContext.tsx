@@ -23,6 +23,8 @@ interface AppContextType {
   activePreset: string; // Current active preset
   topPartiesPanelExpanded: boolean; // Whether the top parties panel is expanded
   dashboardScrollPosition: number; // Scroll position on dashboard to restore after navigation
+  listNameFilter: string; // Name filter in AbsentMembersList
+  listPartyFilter: string; // Party filter in AbsentMembersList
   loading: boolean;
   error: string | null;
   refetchAbsences: (startDate: string, endDate: string, memberName?: string) => Promise<void>;
@@ -31,6 +33,8 @@ interface AppContextType {
   setActivePreset: (preset: string) => void;
   setTopPartiesPanelExpanded: (expanded: boolean) => void;
   setDashboardScrollPosition: (position: number) => void;
+  setListNameFilter: (name: string) => void;
+  setListPartyFilter: (party: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -55,6 +59,8 @@ export function AppProvider({ children }: AppProviderProps) {
   const [activePreset, setActivePreset] = useState<string>('assembly');
   const [topPartiesPanelExpanded, setTopPartiesPanelExpanded] = useState(true);
   const [dashboardScrollPosition, setDashboardScrollPosition] = useState(0);
+  const [listNameFilter, setListNameFilter] = useState('');
+  const [listPartyFilter, setListPartyFilter] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -189,6 +195,8 @@ export function AppProvider({ children }: AppProviderProps) {
     activePreset,
     topPartiesPanelExpanded,
     dashboardScrollPosition,
+    listNameFilter,
+    listPartyFilter,
     loading,
     error,
     refetchAbsences,
@@ -197,6 +205,8 @@ export function AppProvider({ children }: AppProviderProps) {
     setActivePreset,
     setTopPartiesPanelExpanded,
     setDashboardScrollPosition,
+    setListNameFilter,
+    setListPartyFilter,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

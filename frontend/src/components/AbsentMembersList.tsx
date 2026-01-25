@@ -1,9 +1,10 @@
 import { Box, Typography, CircularProgress, Alert, TextField, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AbsentMemberCard } from './AbsentMemberCard';
 import type { EnrichedAbsence } from '../types/absence';
 import { aggregateAbsencesByMember } from '../utils/aggregations';
+import { useAppContext } from '../context/AppContext';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
 import SearchIcon from '@mui/icons-material/Search';
 
@@ -21,8 +22,12 @@ interface AbsentMembersListProps {
  */
 export function AbsentMembersList({ absences, loading, error }: AbsentMembersListProps) {
   const navigate = useNavigate();
-  const [nameFilter, setNameFilter] = useState('');
-  const [partyFilter, setPartyFilter] = useState('');
+  const { 
+    listNameFilter: nameFilter,
+    setListNameFilter: setNameFilter,
+    listPartyFilter: partyFilter,
+    setListPartyFilter: setPartyFilter
+  } = useAppContext();
 
   // Extract unique party names from absences
   const availableParties = useMemo(() => {
