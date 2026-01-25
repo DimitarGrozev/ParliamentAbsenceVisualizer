@@ -80,6 +80,25 @@ export interface LegislativeImport {
   C_St_id: number;
 }
 
+/** Disciplinary action (penalty) imposed on a member */
+export interface DisciplinaryAction {
+  A_ns_MP_Pen_id: number;
+  A_ns_MP_Pen_date: string;
+  A_ns_MP_PenT_id: number;
+  A_ns_MP_PenT_name: string;
+  A_ns_MP_PenS_id: number;
+  A_ns_MP_PenS_name: string;
+  A_ns_MP_Pen_befalf: string;
+  A_ns_MP_id: number;
+  A_ns_MP_Pen_note: string | null;
+  C_St_id: number;
+  created_at: string | null;
+  updated_at: string | null;
+  deleted_at: string | null;
+  A_ns_MP_PenAC_id: number;
+  A_ns_MP_PenAC_timestamp: string | null;
+}
+
 /** Complete member profile data */
 export interface MemberProfile {
   A_ns_id: number;
@@ -123,7 +142,7 @@ export interface MemberProfile {
   // Empty arrays (included for completeness)
   expenseList: unknown[];
   meetingList: unknown[];
-  penalty: unknown[];
+  penalty: DisciplinaryAction[];
   prsList: unknown[];
   lngList: unknown[];
   ScList: unknown[];

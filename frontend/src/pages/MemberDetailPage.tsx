@@ -331,6 +331,7 @@ export default function MemberDetailPage() {
               allowScrollButtonsMobile
             >
               <Tab label={`Absences (${sortedAbsences.length})`} />
+              <Tab label={`Disciplinary Actions (${profile?.penalty.length || 0})`} />
               <Tab label={`Municipalities (${profile?.munList.length || 0})`} />
               <Tab label={`Memberships (${profile?.mshipList.length || 0})`} />
               <Tab label={`Proposed Laws (${profile?.importActList.length || 0})`} />
@@ -363,8 +364,40 @@ export default function MemberDetailPage() {
             </TableContainer>
           </TabPanel>
 
-          {/* Tab 1: Municipalities */}
+          {/* Tab 1: Disciplinary Actions */}
           <TabPanel value={tabValue} index={1}>
+            {profile && profile.penalty.length > 0 ? (
+              <TableContainer component={Paper} variant="outlined" sx={{ overflowX: 'auto' }}>
+                <Table sx={{ minWidth: 500 }}>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}><strong>Date</strong></TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}><strong>Type</strong></TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}><strong>Status</strong></TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {profile.penalty.map((action) => (
+                      <TableRow key={action.A_ns_MP_Pen_id}>
+                        <TableCell>
+                          {formatDateSafe(action.A_ns_MP_Pen_date)}
+                        </TableCell>
+                        <TableCell>{action.A_ns_MP_PenT_name}</TableCell>
+                        <TableCell>
+                          <Chip label={action.A_ns_MP_PenS_name} size="small" />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            ) : (
+              <Typography color="text.secondary">No disciplinary actions data available</Typography>
+            )}
+          </TabPanel>
+
+          {/* Tab 2: Municipalities */}
+          <TabPanel value={tabValue} index={2}>
             {profile && profile.munList.length > 0 ? (
               <TableContainer component={Paper} variant="outlined" sx={{ overflowX: 'auto' }}>
                 <Table sx={{ minWidth: 350 }}>
@@ -389,8 +422,8 @@ export default function MemberDetailPage() {
             )}
           </TabPanel>
 
-          {/* Tab 2: Memberships */}
-          <TabPanel value={tabValue} index={2}>
+          {/* Tab 3: Memberships */}
+          <TabPanel value={tabValue} index={3}>
             {profile && profile.mshipList.length > 0 ? (
               <TableContainer component={Paper} variant="outlined" sx={{ overflowX: 'auto' }}>
                 <Table sx={{ minWidth: 600 }}>
@@ -425,8 +458,8 @@ export default function MemberDetailPage() {
             )}
           </TabPanel>
 
-          {/* Tab 3: Proposed Laws */}
-          <TabPanel value={tabValue} index={3}>
+          {/* Tab 4: Proposed Laws */}
+          <TabPanel value={tabValue} index={4}>
             {profile && profile.importActList.length > 0 ? (
               <TableContainer component={Paper} variant="outlined" sx={{ overflowX: 'auto' }}>
                 <Table sx={{ minWidth: 650 }}>
@@ -469,8 +502,8 @@ export default function MemberDetailPage() {
             )}
           </TabPanel>
 
-          {/* Tab 4: Questions to Ministers */}
-          <TabPanel value={tabValue} index={4}>
+          {/* Tab 5: Questions to Ministers */}
+          <TabPanel value={tabValue} index={5}>
             {profile && profile.controlList.length > 0 ? (
               <TableContainer component={Paper} variant="outlined" sx={{ overflowX: 'auto' }}>
                 <Table sx={{ minWidth: 700 }}>
@@ -505,8 +538,8 @@ export default function MemberDetailPage() {
             )}
           </TabPanel>
 
-          {/* Tab 5: Legislative Amendments */}
-          <TabPanel value={tabValue} index={5}>
+          {/* Tab 6: Legislative Amendments */}
+          <TabPanel value={tabValue} index={6}>
             {profile && profile.legImportList.length > 0 ? (
               <TableContainer component={Paper} variant="outlined" sx={{ overflowX: 'auto' }}>
                 <Table sx={{ minWidth: 550 }}>

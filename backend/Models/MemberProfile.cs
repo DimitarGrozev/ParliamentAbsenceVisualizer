@@ -93,6 +93,28 @@ public class LegislativeImport
 }
 
 /// <summary>
+/// Represents a disciplinary action (penalty) imposed on a member
+/// </summary>
+public class DisciplinaryAction
+{
+    public int A_ns_MP_Pen_id { get; set; }
+    public string A_ns_MP_Pen_date { get; set; } = string.Empty;
+    public int A_ns_MP_PenT_id { get; set; }
+    public string A_ns_MP_PenT_name { get; set; } = string.Empty;
+    public int A_ns_MP_PenS_id { get; set; }
+    public string A_ns_MP_PenS_name { get; set; } = string.Empty;
+    public string A_ns_MP_Pen_befalf { get; set; } = string.Empty;
+    public int A_ns_MP_id { get; set; }
+    public string? A_ns_MP_Pen_note { get; set; }
+    public int C_St_id { get; set; }
+    public string? created_at { get; set; }
+    public string? updated_at { get; set; }
+    public string? deleted_at { get; set; }
+    public int A_ns_MP_PenAC_id { get; set; }
+    public string? A_ns_MP_PenAC_timestamp { get; set; }
+}
+
+/// <summary>
 /// Complete member profile data from parliament.bg API
 /// </summary>
 public class MemberProfile
@@ -134,11 +156,11 @@ public class MemberProfile
     public List<ImportedAct> importActList { get; set; } = new();
     public List<ControlQuestion> controlList { get; set; } = new();
     public List<LegislativeImport> legImportList { get; set; } = new();
+    public List<DisciplinaryAction> penalty { get; set; } = new();
 
     // Empty lists from API (included for completeness)
     public List<object> expenseList { get; set; } = new();
     public List<object> meetingList { get; set; } = new();
-    public List<object> penalty { get; set; } = new();
     public List<object> prsList { get; set; } = new();
     public List<object> lngList { get; set; } = new();
     public List<object> ScList { get; set; } = new();
