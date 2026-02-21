@@ -35,11 +35,6 @@ public class RequestLoggingMiddleware
             _logger.LogWarning("HTTP {StatusCode} {Method} {Path} - {Duration}ms",
                 statusCode, method, path, duration);
         }
-        else
-        {
-            _logger.LogInformation("HTTP {StatusCode} {Method} {Path} - {Duration}ms",
-                statusCode, method, path, duration);
-        }
     }
 }
 
