@@ -9,14 +9,10 @@ namespace ParliamentAbsenceVisualizer.Api.Controllers;
 public class ParliamentController : ControllerBase
 {
     private readonly IParliamentApiService _parliamentApiService;
-    private readonly ILogger<ParliamentController> _logger;
 
-    public ParliamentController(
-        IParliamentApiService parliamentApiService,
-        ILogger<ParliamentController> logger)
+    public ParliamentController(IParliamentApiService parliamentApiService)
     {
         _parliamentApiService = parliamentApiService;
-        _logger = logger;
     }
 
     /// <summary>
@@ -27,16 +23,8 @@ public class ParliamentController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAssembly()
     {
-        try
-        {
-            var assembly = await _parliamentApiService.GetCurrentAssemblyAsync();
-            return Ok(new[] { assembly });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting assembly");
-            return StatusCode(500, "Error retrieving assembly data");
-        }
+        var assembly = await _parliamentApiService.GetCurrentAssemblyAsync();
+        return Ok(new[] { assembly });
     }
 
     /// <summary>
@@ -47,16 +35,8 @@ public class ParliamentController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetParties()
     {
-        try
-        {
-            var parties = await _parliamentApiService.GetPartiesAsync();
-            return Ok(parties);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting parties");
-            return StatusCode(500, "Error retrieving parties data");
-        }
+        var parties = await _parliamentApiService.GetPartiesAsync();
+        return Ok(parties);
     }
 
     /// <summary>
@@ -67,16 +47,8 @@ public class ParliamentController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetMembers()
     {
-        try
-        {
-            var members = await _parliamentApiService.GetMembersAsync();
-            return Ok(members);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting members");
-            return StatusCode(500, "Error retrieving members data");
-        }
+        var members = await _parliamentApiService.GetMembersAsync();
+        return Ok(members);
     }
 
     /// <summary>
@@ -88,27 +60,19 @@ public class ParliamentController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAbsences([FromBody] AbsenceRequest request)
     {
-        try
+        if (request == null)
         {
-            if (request == null)
-            {
-                return BadRequest("Request body is required");
-            }
-
-            var absences = await _parliamentApiService.GetAbsencesAsync(request);
-
-            // Add direct image URLs for each absence
-            foreach (var absence in absences)
-            {
-                absence.MemberImageUrl = $"https://www.parliament.bg/images/Assembly/{absence.A_ns_MP_id}.png";
-            }
-
-            return Ok(absences);
+            return BadRequest("Request body is required");
         }
-        catch (Exception ex)
+
+        var absences = await _parliamentApiService.GetAbsencesAsync(request);
+
+        // Add direct image URLs for each absence
+        foreach (var absence in absences)
         {
-            _logger.LogError(ex, "Error getting absences");
-            return StatusCode(500, "Error retrieving absences data");
+            absence.MemberImageUrl = $"https://www.parliament.bg/images/Assembly/{absence.A_ns_MP_id}.png";
         }
+
+        return Ok(absences);
     }
 }

@@ -1,5 +1,6 @@
 using ParliamentAbsenceVisualizer.Api.Services;
 using ParliamentAbsenceVisualizer.Api.Configuration;
+using ParliamentAbsenceVisualizer.Api.Middleware;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -96,7 +97,10 @@ builder.Services.AddRateLimiter(options =>
 });
 
 // Register HttpClient and services with decorator pattern
-builder.Services.AddHttpClient<ParliamentApiService>();
+builder.Services.AddHttpClient<ParliamentApiService>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
 builder.Services.AddScoped<IParliamentApiService>(sp =>
 {
     // Get HttpClientFactory and create real service
@@ -116,6 +120,8 @@ builder.Services.AddScoped<IParliamentApiService>(sp =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
+app.UseRequestLogging();
+app.UseGlobalExceptionHandler();
 app.UseRateLimiter();
 
 if (app.Environment.IsDevelopment())
